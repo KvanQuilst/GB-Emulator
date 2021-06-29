@@ -12,7 +12,7 @@ struct instruction {
     uint8_t operandLendth;
     void *execute;
 };
-extern instruction[256];
+//extern instruction[256];
 
 const struct instruction instructions[256] = {
     {"NOP", 0, NULL},
@@ -28,8 +28,10 @@ void instruct(uint8_t code)
 {
     switch (code) {
 
-        ////
-        //  LD   nn, n (8 cycles) - unfinished
+        //// 8-bit loads
+
+        ////TODO
+        //  LD   nn, n (8 cycles)
         //  Put value n into nn
         ////
 
@@ -57,7 +59,7 @@ void instruct(uint8_t code)
         case 0x2E:
             break;
 
-        ////
+        ////TODO
         // LD    r1, r2 (4 cycles) - unfinished
         //   Put value r2 into r1
         ////
@@ -288,6 +290,243 @@ void instruct(uint8_t code)
 
         /* LD   (HL), n (12 cycles) */
         case 0x36:
+            break;
+
+        ////
+        //  LD   A, n (4 cycles)
+        //  put value n into A
+        ////
+
+        /* LD   A, (BC) (8 cycles) */
+        case 0x0A:
+            break;
+
+        /* LD   A, (DE) (8 cycles) */
+        case 0x1A:
+            break;
+
+        /* LD   A, (nn) (16 cycles) */        
+        case 0xFA:
+            break;
+
+        /* LD   A, # (8 cycles) */
+        case 0x3E:
+            break;
+
+        ////TODO
+        //  LD   n, A (4 cycles) */
+        //  Put value A into n
+        ////
+
+        /* LD   B, A */
+        case 0x47:
+            break;
+
+        /* LD   C, A */
+        case 0x4F:
+            break;
+
+        /* LD   D, A */
+        case 0x57:
+            break;
+
+        /* LD  E, A */
+        case 0x5F:
+            break;
+
+        /* LD  H, A */
+        case 0x67:
+            break;
+
+        /* LD  L, A */
+        case 0x6F:
+            break;
+
+        /* LD   (BC), A (8 cycles) */
+        case 0x02:
+            break;
+
+        /* LD   (DE), A (8 cycles) */
+        case 0x12:
+            break;
+
+        /* LD   (HL), A (8 cycles) */
+        case 0x77:
+            break;
+
+        /* LD   (nn), A (16 cycles) */
+        case 0xEA:
+            break;
+
+        ////TODO
+        //  LD   A, (C) (8 cycles)
+        //  Put value at $FF00 + register C into A
+        //  Same as LD   A, ($FF00+C)
+        ////
+        case 0xF2:
+            break;
+
+        ////TODO
+        //  LD   (C), A (8 cycles)
+        //  Put A into address $FF00 + register C
+        ////
+        case 0xE2:
+            break;
+
+        ////TODO
+        //  LDD  A, (HL) (8 cycles)
+        //  LD   A, (HLD)
+        //  LD   A, (HL-)
+        //  Put value at HL into A; decrement HL
+        //  Same as LD   A, (HL) - DEC HL
+        ////
+        case 0x3A:
+            break;
+
+        ////TODO
+        //  LDD  (HL), A (8 cycles)
+        //  LD   (HL-), A 
+        //  LD   (HLD), A
+        //  Put A into memory address HL; decrement HL
+        //  Same as LD   (HL), A - DEC HL
+        ////
+        case 0x32:
+            break;
+
+        ////TODO
+        //  LDI  A, (HL) (8 cycles)
+        //  LD   A, (HLI)
+        //  LD   A, (HL+)
+        //  Put value at address HL into A; increment HL
+        //  Same as LD   A, (HL) - INC HL
+        ////
+        case 0x2A:
+            break;
+
+        ////TODO
+        //  LDI  (HL), A (8 cycles)
+        //  LD   (HLI), A
+        //  LD   (HL+), A
+        //  Put A into memory addres HL; increment HL
+        //  Same as LD   (HL), A - INC HL
+        ////
+        case 0x22:
+            break;
+        
+        ////TODO
+        //  LDH  (n), A (12 cycles)
+        //  LD   ($FF00+n), A 
+        //  Put A into memory address $FF00+n
+        //  n = one byte immediate value
+        ////
+        case 0xE0:
+            break;
+
+        ////TODO
+        //  LDH  A, (n) 912 cycles)
+        //  LD   A, ($FF00)
+        //  Put memory address $FF00+n into A
+        ////
+        case 0xF0:
+            break;
+
+        //// 16-bit loads
+
+        ////TODO
+        //  LD   n, nn (12 cycles)
+        //  Put value nn into n
+        //  n  = BC, DE, HL, SP
+        //  nn = 16bit immediate value
+        ////
+        
+        /* LD   BC, nn */
+        case 0x01:
+            break;
+
+        /* LD   DE, nn */
+        case 0x11:
+            break;
+
+        /* LD   HL, nn */
+        case 0x21:
+            break;
+
+        /* LD HL, nn */
+        case 0x31:
+            break;
+
+        ////TODO
+        //  LD   SP, HL (8 cycles)
+        //  Put HL into Stack Pointer
+        ////
+        case 0xF9:
+            break;
+
+        ////TODO
+        //  LDHL SP, n (12 cycles)
+        //  LD   HL, SP+n
+        //  Put SP+n effective address into HL
+        //  n = one byte signed immediate value
+        //  
+        //  FLAGS:
+        //    Z - Reset
+        //    N - Reset
+        //    H - Set or reset according to operation
+        //    C - Set or reset according to operation
+        ////
+        case 0xF8:
+            break;
+
+        ////TODO
+        //  LD   (nn), SP (20 cycles)
+        //  Put Stack Pointer at address n
+        //  n = two byte immediate address
+        ////
+        case 0x08:
+            break;
+
+        ////TODO
+        //  PUSH nn (16 cycles)
+        //  Push register pair nn onto stack; dec SP twice
+        //  nn = AF, BC, DE, HL
+        ////
+        
+        /* PUSH AF */
+        case 0xF5:
+            break;
+
+        /* PUSH BC */
+        case 0xC5:
+            break;
+
+        /* PUSH DE */
+        case 0xD5:
+            break;
+        
+        /* PUSH HL */
+        case 0xE5:
+            break;
+
+        ////TODO
+        //  POP  nn (12 cycles)
+        //  Pop two bytes off stack into register pair nn
+        //  nn = AF, BC, DE, HL
+        ////
+        
+        /* POP  AF */
+        case 0xF1:
+            break;
+
+        /* POP BC */
+        case 0xC1:
+            break;
+
+        /* POP DE */
+        case 0xD1:
+            break;
+
+        /* POP HL */
+        case 0xE1:
             break;
 
         default:
