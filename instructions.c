@@ -292,7 +292,7 @@ void instruct(uint8_t code)
         case 0x36:
             break;
 
-        ////
+        ////TODO
         //  LD   A, n (4 cycles)
         //  put value n into A
         ////
@@ -423,11 +423,233 @@ void instruct(uint8_t code)
             break;
 
         ////TODO
-        //  LDH  A, (n) 912 cycles)
+        //  LDH  A, (n) (12 cycles)
         //  LD   A, ($FF00)
         //  Put memory address $FF00+n into A
         ////
         case 0xF0:
+            break;
+
+        ////TODO
+        //  ADD  A, n (4 cycles)
+        //  Add n to A
+        //  n = A, B, C, D, E, H, L, (HL), #
+        //  Flags: Z - Set if result is zero
+        //         N - Reset
+        //         H - Set if carry from bit 3
+        //         C - Set if carry from bit 7
+        ////
+        
+        /* ADD  A, A */
+        case 0x87:
+            break;
+
+        /* ADD  A, B */
+        case 0x80:
+            break;
+
+        /* ADD  A, C */
+        case 0x81:
+            break;
+
+        /* ADD  A, D */
+        case 0x82:
+            break;
+
+        /* ADD  A, E */
+        case 0x83:
+            break;
+
+        /* ADD  A, H */
+        case 0x84:
+            break;
+
+        /* ADD  A, L */
+        case 0x85:
+            break;
+
+        /* ADD  A, (HL) (8 cycles) */
+        case 0x86:
+            break;
+
+        /* ADD  A, # (8 cycles) */
+        case 0xC6:
+            break;
+
+        ////TODO
+        //  ADC  A, n (4 cycles)
+        //  Add n + Carry Flag (H, C) to A
+        //  n = A, B, C, D, E, H, L, (HL), #
+        //  Flags: Check above
+        ////
+        
+        /* ADC  A, A */
+        case 0x8F:
+            break;
+
+        /* ADC  A, B */
+        case 0x88:
+            break;
+
+        /* ADC  A, C */
+        case 0x89:
+            break;
+
+        /* ADC  A, D */
+        case 0x8A:
+            break;
+
+        /* ADC  A, E */
+        case 0x8B:
+            break;
+
+        /* ADC  A, H */
+        case 0x8C:
+            break;
+
+        /* ADC  A, L */
+        case 0x8D:
+            break;
+
+        /* ADC  A, (HL) (8 cycles) */
+        case 0x8E:
+            break;
+
+        /* ADC  A, # (8 cycles) */
+        case 0xCE:
+            break;
+
+        ////TODO
+        //  SUB n (4 cycles)
+        //  Subtract n from A
+        //  n = A, B, C, D, E, H, L, (HL), #
+        //  Flags: Z - Set if result is zero
+        //         N - Set
+        //         H - Set if no borrow from bit 4
+        //         C - Set if no borrow
+        ////
+        
+        /* SUB  A */
+        case 0x97:
+            break;
+
+        /* SUB  B */
+        case 0x90:
+            break;
+
+        /* SUB  C */
+        case 0x91:
+            break;
+
+        /* SUB  D */
+        case 0x92:
+            break;
+
+        /* SUB  E */
+        case 0x93:
+            break;
+
+        /* SUB  H */
+        case 0x94:
+            break;
+
+        /* SUB  L */
+        case 0x95:
+            break;
+
+        /* SUB  (HL) (8 cycles) */
+        case 0x96:
+            break;
+
+        /* SUB  # (8 cycles) */
+        case 0xD6:
+            break;
+
+        ////TODO
+        //  SBC  A, n (4 cycles)
+        //  Subtract n + Carry flag from A
+        //  n = A, B, C, D, E, H, L, (HL), #
+        //  Flags: same as above
+
+        /* SBC  A, A */
+        case 0x9F:
+            break;
+
+        /* SBC  A, B */
+        case 0x98:
+            break;
+
+        /* SBC  A, C */
+        case 0x99:
+            break;
+
+        /* SBC  A, D */
+        case 0x9A:
+            break;
+
+        /* SBC  A, E */
+        case 0x9B:
+            break;
+
+        /* SBC  A, H */
+        case 0x9C:
+            break;
+    
+        /* SBC  A, L */
+        case 0x9D:
+            break;
+
+        /* SBC  A, (HL) (8 cycles) */
+        case 0x9E:
+            break;
+
+        /* SBC  A, # (??) */
+        /* case 0x?? */
+
+        ////TODO
+        //  ADD  n (4 cycles)
+        //  Logically AND n with A, result in A
+        //  n = A, B, C, D, E, H, L, (HL), #
+        //  Flags: Z - Set if result zero
+        //         N - Reset
+        //         H - Set
+        //         C - Reset
+        ////
+
+        /* AND  A */
+        case 0xA7:
+            break;
+
+        /* AND  B */
+        case 0xA0:
+            break;
+
+        /* AND  C */
+        case 0xA1:
+            break;
+
+        /* AND  D */
+        case 0xA2:
+            break;
+
+        /* AND  E */
+        case 0xA3:
+            break;
+
+        /* AND  H */
+        case 0xA4:
+            break;
+
+        /* AND  L */
+        case 0xA5:
+            break;
+
+        /* AND  (HL) (8 cycles) */
+        case 0xA6:
+            break;
+
+        /* AND  # (8 cycles) */
+        case 0xE6:
             break;
 
         //// 16-bit loads
