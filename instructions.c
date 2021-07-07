@@ -7,18 +7,6 @@
 #include <stdint.h>
 #include <stdio.h>
 
-struct instruction {
-    char *dissas;
-    uint8_t operandLendth;
-    void *execute;
-};
-//extern instruction[256];
-
-const struct instruction instructions[256] = {
-    {"NOP", 0, NULL},
-    {"", 0, NULL}
-};
-
 /*
  * nn - A, B, C, D, E, H. L
  * n  - 8bit immediate value
@@ -652,6 +640,221 @@ void instruct(uint8_t code)
         case 0xE6:
             break;
 
+        ////TODO
+        //  OR   n (4 cycles)
+        //  Logical OR n with register A, result in A
+        //  n = A, B, C, D, E, H, L, (HL), #
+        //  Flags: Z - Set if result is zero
+        //         N, H, C - Reset
+        ////
+
+        /* OR   A */
+        case 0xB7:
+            break;
+
+        /* OR   B */
+        case 0xB0:
+            break;
+
+        /* OR   C */
+        case 0xB1:
+            break;
+
+        /* OR   D */
+        case 0xB2:
+            break;
+
+        /* OR   E */
+        case 0xB3:
+            break;
+
+        /* OR   H */
+        case 0xB4:
+            break;
+
+        /* OR   L */
+        case 0xB5:
+            break;
+
+        /* OR   (HL) (8 cycles) */
+        case 0xB6:
+            break;
+
+        /* OR   # (8 cycles) */
+        case 0xF6:
+            break;
+
+        ////TODO
+        //  XOR  n (4 cycles)
+        //  Logical exclusive OR n with register A; store in A
+        //  n = A, B, C, D, E, H, L, (HL), #
+        //  Flags: Same as above
+        ////
+
+        /* XOR  A */
+        case 0xAF:
+            break;
+
+        /* XOR  B */
+        case 0xA8:
+            break;
+
+        /* XOR  C */
+        case 0xA9:
+            break;
+
+        /* XOR  D */
+        case 0xAA:
+            break;
+
+        /* XOR  E */
+        case 0xAB:
+            break;
+
+        /* XOR  H */
+        case 0xAC:
+            break;
+
+        /* XOR  L */
+        case 0xAD:
+            break;
+
+        /* XOR  (HL) (8 cycles) */
+        case 0xAE:
+            break;
+
+        /* XOR  # (8 cycles) */
+        case 0xEE:
+            break;
+
+        ////TODO
+        //  CP   n (4 cycles)
+        //  Compare A with n (A - n without results)
+        //  n = A, B, C, D, E, H, L (HL), #
+        //  Flags: Z - Set if result is zero (A = n)
+        //         N - Set
+        //         H - SEt if no borrow from bit 4
+        //         C - Set for no borrow (A < n)
+        ////
+
+        /* CP   A */
+        case 0xBF:
+            break;
+
+        /* CP   B */
+        case 0xB8:
+            break;
+
+        /* CP   C */
+        case 0xB9:
+            break;
+
+        /* CP   D */
+        case 0xBA:
+            break;
+
+        /* CP   E */
+        case 0xBB:
+            break;
+
+        /* CP   H */
+        case 0xBC:
+            break;
+
+        /* CP   L */
+        case 0xBD:
+            break;
+
+        /* CP  (HL) (8 cycles) */
+        case 0xBE:
+            break;
+
+        /* CP   # (8 cycles) */
+        case 0xFE:
+            break;
+
+        ////TODO
+        //  INC  n (4 cycles)
+        //  n = A, B, C, D, E, H, L (HL)
+        //  Flags: Z - Set if result is zero
+        //         N - Reset
+        //         H - Set if carry from bit 3
+        //         C - Not affected
+        ////
+
+        /* INC  A */
+        case 0x3C:
+            break;
+
+        /* INC  B */
+        case 0x04:
+            break;
+
+        /* INC  C */
+        case 0x0C:
+            break;
+
+        /* INC  D */
+        case 0x14:
+            break;
+
+        /* INC E */
+        case 0x1C:
+            break;
+
+        /* INC  H */
+        case 0x24:
+            break;
+
+        /* INC  L */
+        case 0x2C:
+            break;
+
+        /* INC  (HL) (12 cycles) */
+        case 0x34:
+            break;
+
+        ////TODO
+        //  DEC  n (4 cycles)
+        //  n = A, B, C, D, E, H, L, H, (HL)
+        //  Flags: Z - Set if result is zero
+        //         N - Set
+        //         H - Set if no borrow from bit 4
+        //         C - Not affected
+        ////
+
+        /* DEC  A */
+        case 0x3D:
+            break;
+
+        /* DEC  B */
+        case 0x05:
+            break;
+
+        /* DEC  C */
+        case 0x0D:
+            break;
+
+        /* DEC  D */
+        case 0x15:
+            break;
+
+        /* DEC  E */
+        case 0x1D:
+            break;
+
+        /* DEC  H */
+        case 0x25:
+            break;
+
+        /* DEC  L */
+        case 0x2D:
+            break;
+
+        /* DEC  (HL) (12 cycles) */
+        case 0x35:
+            break;
+
         //// 16-bit loads
 
         ////TODO
@@ -749,6 +952,87 @@ void instruct(uint8_t code)
 
         /* POP HL */
         case 0xE1:
+            break;
+
+        ////TODO
+        //  ADD  HL, n (8 cycles)
+        //  Add n to HL
+        //  n = BC, DE, HL, SP
+        //  Flags: Z - Not affected
+        //         N - Reset
+        //         H - Set if carry from bit 11
+        //         C - Set if carry from bit 15
+        ////
+
+        /* ADD  HL, BC */
+        case 0x09:
+            break;
+
+        /* ADD  HL, DE */
+        case 0x19:
+            break;
+
+        /* ADD  HL, HL */
+        case 0x29:
+            break;
+
+        /* ADD  HL, SP */
+        case 0x39:
+            break;
+
+        ////TODO
+        //  ADD  SP, n (16 cycles)
+        //  n = one byte sign immediate value (#)
+        //  Flags: Z - Reset
+        //         N - Reset
+        //         H - Set or reset according to operation
+        //         C - Set or reset according to operation
+        ////
+        case 0xE8:
+            break;
+
+        ////TODO
+        //  INC  nn (8 cycles)
+        //  Increment register nn
+        //  nn = BC, DE, HL, SP
+        ////
+
+        /* INC  BC */
+        case 0x03:
+            break;
+
+        /* INC  DE */
+        case 0x13:
+            break;
+
+        /* INC  HL */
+        case 0x23:
+            break;
+
+        /* INC  SP */
+        case 0x33:
+            break;
+
+        ////TODO
+        //  DEC  nn (8 cycles)
+        //  Decrement register nn
+        //  nn = BC, DE, HL, SP
+        ////
+
+        /* DEC  BC */
+        case 0x0B:
+            break;
+
+        /* DEC  DE */
+        case 0x1B:
+            break;
+
+        /* DEC  HL */
+        case 0x2B:
+            break;
+
+        /* DEC  SP */
+        case 0x3B:
             break;
 
         default:
