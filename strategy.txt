@@ -14,15 +14,17 @@ Flags:
 
 CPU:
   - Switch statement instructions
-  - 1 machine cycle = 4 clock cycles
-
-Memory:
+  - 1 machine cycle = 4 clock cycles Memory:
   - High RAM => Zero Page Memory
   - Cartridge Data => ROM
   - RAM (out-of-context) => Working Memory
-  - Main RAM: 8K B
-  - VRAM: 8K B
-  -
+  - Main RAM: 8k B
+  - VRAM: 8k B
+
+Memory:
+  - ROM sizes:	0x8000B (32kB), 0x10000 (64kB), 0x80000 (128kB)
+				0x100000 (256kB), 0x800000 (512kB), 0x1000000 (1024kB)
+				0x8000000 (2048kB), 0x10000000 (4096kB)
 
 Graphics:
   - Resolution: 160x144px (20x18 tiles)
