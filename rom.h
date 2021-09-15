@@ -5,6 +5,8 @@
  * printing to the console the rom header info
  */
 
+#pragma once
+
 // Locations on ROM for specific data
 #define ROM_TITLE	0x0134
 #define ROM_TYPE	0x0147

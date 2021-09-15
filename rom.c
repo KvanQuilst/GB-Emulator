@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "memory.h"
+
 #include "rom.h"
 
 const char *rom_string[256] = 
@@ -88,18 +90,18 @@ uint8_t loadROM(char* filename)
 	rewind(rom);
 
 	// read header into string
-	length = 0;
-	memset(title, 0, ROM_START);
-	while (length < ROM_START) {
-		errno = 0;		
-		length += fread(header, 1, ROM_START, rom);
-		if (errno != 0) {
-			perror("fread");
-			fclose(rom);
-			return -1;
-		}
+	memset(header, 0, ROM_START);
+	errno = 0;
+	fread(header, 1, ROM_START, rom);
+	
+	// check for fread error
+	if (errno != 0) {
+		perror("fread");
+		fclose(rom);
+		return -1;
 	}
 
+	// Print rom info
 	memcpy(title, &header[ROM_TITLE], TITLE_SIZE);
 	printf("Title:		%s\n", title);
 
@@ -110,7 +112,29 @@ uint8_t loadROM(char* filename)
 	printf("ROM Size:	%ukB\n", rom_size);
 
 	ram_size = (header[RAM_SIZE]>0) * 2<<((header[RAM_SIZE]*2)-1);
-	printf("RAM Size:	%ukB\n", ram_size);
+	printf("RAM Size:	%ukB\n\n", ram_size);
+
+	// copy rest of rom into cart
+		
+		// seek to end of header
+	if (fseek(rom, ROM_START, SEEK_SET) == -1) {
+		perror("fseek");
+		fclose(rom);
+		return -1;	
+	}
+
+		// read into cart
+	size_t tmp = ROM_START;
+	while (tmp < length) {
+		errno = 0;
+		tmp += fread(cart, 1, length-tmp, rom);
+		if (errno != 0) {
+			perror("fread");
+			fclose(rom);
+			return -1;
+		}				
+	}
+	printf("cart write success!\n");
 
 	return 0;
 }
