@@ -1,0 +1,80 @@
+Strategy.txt
+Notes, order of development, and todo list for developing the
+emulator
+
+#########
+# Notes #
+#########
+
+Registers:
+  - Utilize anonymous structs
+
+Flags:
+  - Half-Carry Flag always cleared
+
+CPU:
+  - Switch statement instructions
+  - 1 machine cycle = 4 clock cycles
+
+Memory:
+  - High RAM => Zero Page Memory
+  - Cartridge Data => ROM
+  - RAM (out-of-context) => Working Memory
+  - Main RAM: 8K B
+  - VRAM: 8K B
+  -
+
+Graphics:
+  - Resolution: 160x144px (20x18 tiles)
+  - Up to 40 Sprites | 10 per line
+  - Sprite size: 8x8px - 8x16px
+  - GB supports 256-bit monochrome
+  - Maps...?
+
+ROMs:
+  - All ROMs start at offset address 0x0134
+  - Header = 16+2+1+1+1+1+1+1+1+1+2 = 28 bytes
+
+Screen:
+  - ncurses?
+
+Audio:
+  - 4 channels (stereo)
+
+Debug:
+  - List Register Values (by 16-bit pairs)
+  - Current Flag
+  - List current instruction
+  - Breakpoints and Stepper Capability
+
+#############
+# EMULATION #
+#############
+
+###############
+# 1. Read ROM #
+###############
+
+1. Open the file (fopen)
+2. Determine size (fseek, ftell) -> ROM should be bigger
+	 than 0x180 (384) bytes
+3. Seek to front of file
+4. Read header (reference rom header documentation)
+5. Dump game data into "cart"
+
+###############
+# 2. CPU Loop #
+###############
+
+** instruction struct: {char[] disas, uint_8 n_ops, *void execute}
+
+1. Read instruction
+2. Determine operand(s) (0-2bytes) (ensure pc is incremented)
+3. Execute instruction w/ operands as args
+4. Increment tick count
+
+###############
+# 3. GPU Loop #
+###############
+
+1. Update tiles (?)
