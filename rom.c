@@ -12,11 +12,46 @@
 
 #include "rom.h"
 
+const char *rom_string[256] = 
+{
+	[ROM]		= "ROM",
+	[MBC1]		= "MBC1",
+	[MBC1_R]	= "MBC1+RAM",
+	[MBC1_RB]	= "MBC1+RAM+BATT",
+	[MBC2]		= "MBC2",
+	[MBC2_B]	= "MBC2_BATT",
+	[ROM_R]		= "ROM+RAM",
+	[ROM_RB]	= "ROM+RAM+BATT",
+	[MMM01]		= "MMM01",
+	[MMM01_R]	= "MMM01+RAM",
+	[MMM01_RB]	= "MMM01+RAM+BATT",
+	[MBC3_TB]	= "MBC3+TIMER+BATT",
+	[MBC3_TRB]	= "MBC3+TIMER+RAM+BATT",
+	[MBC3]		= "MBC3",
+	[MBC3_R]	= "MBC3+RAM",
+	[MBC3_RB]	= "MBC3+RAM+BATT",
+	[MBC4]		= "MBC4",
+	[MBC4_R]	= "MBC4+RAM",
+	[MBC4_RB]	= "MBC4+RAM+BATT",
+	[MBC5]		= "MBC5",
+	[MBC5_R]	= "MBC5+RAM",
+	[MBC5_RB]	= "MBC5+RAM+BATT",
+	[MBC5_S]	= "MBC5+RUMBLE",
+	[MBC5_SR]	= "MBC5+RUMBLE+RAM",
+	[MBC5_SRB]	= "MBC5+rUMBLE+RAM+BATT",
+	[POKECAM]	= "Pocket Camera",
+	[BANDAI]	= "Bandai TAMA5",
+	[HuC3]		= "Hudson HuC3",
+	[HuC3_RB]	= "Hudson HuC3+RAM+BATT"
+};
+
 uint8_t loadROM(char* filename)
 {
+	char header[ROM_START]; // header of the rom
 	char title[TITLE_SIZE];	// title of rom
-	uint8_t rom_size;		// size of the rom
-	uint8_t ram_size;		// size of the save ram
+	enum rom_t rom_type;	// type of ram
+	int rom_size;			// size of the rom
+	int ram_size;			// size of the save ram
 	size_t length;			// size of file
 
 	FILE *rom;
@@ -50,21 +85,14 @@ uint8_t loadROM(char* filename)
 		return -1;
 	}
 
-	// get title
-	
-		// set position
-	if (fseek(rom, 0x0134, SEEK_SET) == -1) {
-		perror("fseek");
-		fclose(rom);
-		return -1;
-	}
+	rewind(rom);
 
-		// read title
+	// read header into string
 	length = 0;
-	memset(title, 0, TITLE_SIZE);
-	while (length < TITLE_SIZE) {
+	memset(title, 0, ROM_START);
+	while (length < ROM_START) {
 		errno = 0;		
-		length += fread(title, 1, TITLE_SIZE, rom);
+		length += fread(header, 1, ROM_START, rom);
 		if (errno != 0) {
 			perror("fread");
 			fclose(rom);
@@ -72,10 +100,17 @@ uint8_t loadROM(char* filename)
 		}
 	}
 
-	printf("Title: %s\n", title);
+	memcpy(title, &header[ROM_TITLE], TITLE_SIZE);
+	printf("Title:		%s\n", title);
 
-	// determine rom type
+	rom_type = header[ROM_TYPE];
+	printf("ROM Type:	%s\n", rom_string[rom_type]);
 
+	rom_size = 2<<(header[ROM_SIZE]+4);
+	printf("ROM Size:	%ukB\n", rom_size);
+
+	ram_size = (header[RAM_SIZE]>0) * 2<<((header[RAM_SIZE]*2)-1);
+	printf("RAM Size:	%ukB\n", ram_size);
 
 	return 0;
 }
