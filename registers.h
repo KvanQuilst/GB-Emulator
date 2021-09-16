@@ -28,6 +28,11 @@
 
 #include <stdint.h>
 
+#define ZERO_FLAG   0x80
+#define SUB_FLAG    0x40
+#define HALF_FLAG   0x20
+#define CARRY_FLAG  0x10
+
 struct registers {
     struct {
         union {
