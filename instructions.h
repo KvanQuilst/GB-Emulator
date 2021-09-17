@@ -4,7 +4,14 @@
  * contains the prototypes for all instructions
  */
 
+#pragma once
+
+#include <stdint.h>
+
 void undefined(void);
+
+uint8_t inc(uint8_t val);
+uint8_t dec(uint8_t val);
 
 void nop(void);
 

@@ -283,55 +283,60 @@ void undefined(void)
     printf("this instruction is undefined\n");
 }
 
-// nop
+////
+//  General Instructions
+////
+
+// increase values and set flags
+// requires: val to increase
+// returns: increased value
+uint8_t inc(uint8_t val)
+{
+	registers.f &= !(HALF_FLAG + SUB_FLAG); // unset SUB_ and HALF_FLAG
+	registers.f |= ((val & 0x0f) == 0x0f) * HALF_FLAG;
+	val++;
+	registers.f |= (val == 0) * ZERO_FLAG;
+	return val;
+}
+
+// decrease values and set flags
+// requires: val to decrease
+// returns: decreased value
+uint8_t dec(uint8_t val)
+{
+	registers.f &= !(HALF_FLAG);
+	registers.f |= (val & 0x0f) * HALF_FLAG;
+	val--;
+	registers.f |= (val == 0) * ZERO_FLAG
+				+  SUB_FLAG;
+	return val;
+}
+
+// 0x00 nop
 void nop(void) {}
 
 ////
 //	A
 ////
 
-// INC A
-void inc_a(void)
-{
-	registers.a++;
-	registers.f |= (registers.a == 0) * ZERO_FLAG;
-	registers.f &= !SUB_FLAG
-	//TODO HALF_FLAG
-}
+// 0x3C INC A
+void inc_a(void) { registers.a = inc(registers.a); }
 
-// DEC A
-void dec_a(void)
-{
-	registers.a--;
-	registers.f |= (registers.a == 0) * ZERO_FLAG
-				+  SUB_FLAG;
-	//TODO HALF_FLAG
-}
+// 0x3D DEC A
+void dec_a(void) { registers.a = dec(registers.a); }
 
 
 ////
 //  B
 ///
 
-// INC B
-void inc_b(void) 
-{
-	registers.b++;
-	registers.f |= (registers.b == 0) * ZERO_FLAG;
-	registers.f &= !SUB_FLAG;
-	//TODO HALF_FLAG
-}
+// 0x04 INC B
+void inc_b(void) { registers.b = inc(registers.b); }
 
-// DEC B
-void dec_b(void)
-{
-	registers.b--;
-	registers.f |= (registers.b == 0) * ZERO_FLAG
-				+  SUB_FLAG;
-	//TODO HALF_FLAG
-}
+// 0x05 DEC B
+void dec_b(void) { registers.b = dec(registers.b); }
 
-// LD B,n
+// 0x06 LD B,n
 void ld_b_n(uint8_t operand) { registers.b = operand; }
 
 
@@ -339,25 +344,13 @@ void ld_b_n(uint8_t operand) { registers.b = operand; }
 //  C
 ////
 
-// INC C
-void inc_c(void)
-{
-	registers.c++;
-	registers.f |= (registers.c == 0) * ZERO_FLAG;
-	registers.f &= !SUB_FLAG
-	//TODO HALF_FLAG
-}
+// 0x0C INC C
+void inc_c(void) { registers.c = inc(registers.c); }
 
-// DEC C
-void dec_c(void)
-{
-	registers.c--;
-	registers.f |= (registers.c == 0) * ZERO_FLAG
-				+  SUB_FLAG;
-	//TODO HALF_FLAG
-}
+// 0x0D DEC C
+void dec_c(void) { registers.c = dec(registers.c); }
 
-// LD C,n
+// 0x0E LD C,n
 void ld_c_n(uint8_t operand) { registers.c = operand; }
 
 
@@ -365,13 +358,13 @@ void ld_c_n(uint8_t operand) { registers.c = operand; }
 //	BC
 ////
 
-// LD BC,nn
+// 0x02 LD BC,nn
 void ld_bc_nn(uint16_t operand) { registers.bc = operand; }
 
-// INC BC
+// 0x03 INC BC
 void inc_bc(void) { registers.bc++; }
 
-// DEC BC
+// 0x0B DEC BC
 void dec_bc(void) {	registers.bc--; }
 
 
@@ -379,25 +372,13 @@ void dec_bc(void) {	registers.bc--; }
 //  D
 ////
 
-// INC D
-void inc_d(void)
-{
-	registers.d++;
-	registers.f |= (registers.d == 0) * ZERO_FLAG;
-	registers.f &= !SUB_FLAG
-	//TODO HALF_FLAG
-}
+// 0x14 INC D
+void inc_d(void) { registers.d = inc(registers.d); }
 
-// DEC D
-void dec_d(void)
-{
-	registers.d--;
-	registers.f |= (registers.d == 0) * ZERO_FLAG
-				+  SUB_FLAG;
-	//TODO HALF_FLAG
-}
+// 0x15 DEC D
+void dec_d(void) { registers.d = dec(registers.d); }
 
-// LD D,n
+// 0x16 LD D,n
 void ld_d_n(uint8_t operand) { registers.d = operand; }
 
 
@@ -405,25 +386,13 @@ void ld_d_n(uint8_t operand) { registers.d = operand; }
 //  E
 ////
 
-// INC E
-void inc_e(void)
-{
-	registers.e++;
-	registers.f |= (registers.e == 0) * ZERO_FLAG;
-	registers.f &= !SUB_FLAG
-	//TODO HALF_FLAG
-}
+// 0x1C INC E
+void inc_e(void) { registers.e = inc(registers.e); }
 
-// DEC E
-void dec_e(void)
-{
-	registers.e--;
-	registers.f |= (registers.e == 0) * ZERO_FLAG
-				+  SUB_FLAG;
-	//TODO HALF_FLAG
-}
+// 0x1D DEC E
+void dec_e(void) { registers.e = dec(registers.e); }
 
-// LD E,n
+// 0x1E LD E,n
 void ld_e_n(uint8_t operand) { registers.e = operand; }
 
 
@@ -431,13 +400,13 @@ void ld_e_n(uint8_t operand) { registers.e = operand; }
 //	DE
 ////
 
-// LD DE,nn
+// 0x11 LD DE,nn
 void ld_de_nn(uint16_t operand) { registers.de = operand; }
 
-// INC DE
+// 0x13 INC DE
 void inc_de(void) {	registers.de++; }
 
-// DEC DE
+// 0x1B DEC DE
 void dec_de(void) {	registers.de--; }
 
 
@@ -445,25 +414,13 @@ void dec_de(void) {	registers.de--; }
 //  H
 ////
 
-// INC H
-void inc_h(void)
-{
-	registers.h++;
-	registers.f |= (registers.h == 0) * ZERO_FLAG;
-	registers.f &= !SUB_FLAG
-	//TODO HALF_FLAG
-}
+// 0x24 INC H
+void inc_h(void) { registers.h = inc(registers.h); }
 
-// DEC H
-void dec_h(void)
-{
-	registers.h--;
-	registers.f |= (registers.h == 0) * ZERO_FLAG
-				+  SUB_FLAG;
-	//TODO HALF_FLAG
-}
+// 0x25 DEC H
+void dec_h(void) { registers.h = dec(registers.h); }
 
-// LD H,n
+// 0x26 LD H,n
 void ld_h_n(uint8_t operand) { registers.h = operand; }
 
 
@@ -471,25 +428,13 @@ void ld_h_n(uint8_t operand) { registers.h = operand; }
 //  L
 ////
 
-// INC L
-void inc_l(void)
-{
-	registers.l++;
-	registers.f |= (registers.l == 0) * ZERO_FLAG;
-	registers.f &= !SUB_FLAG
-	//TODO HALF_FLAG
-}
+// 0x2C INC L
+void inc_l(void) { registers.l = inc(registers.l); }
 
-// DEC L
-void dec_l(void)
-{
-	registers.l--;
-	registers.f |= (registers.l == 0) * ZERO_FLAG
-				+  SUB_FLAG;
-	//TODO HALF_FLAG
-}
+// 0x2D DEC L
+void dec_l(void) { registers.l = dec(registers.l); }
 
-// LD L,n
+// 0x2E LD L,n
 void ld_l_n(uint8_t operand) { registers.l = operand; }
 
 
@@ -497,39 +442,39 @@ void ld_l_n(uint8_t operand) { registers.l = operand; }
 //	HL
 ////
 
-// LD HL,nn
+// 0x21 LD HL,nn
 void ld_hl_nn(uint16_t operand) { registers.hl = operand; }
 
-// LD (HL+),A
+// 0x22 LD (HL+),A
 void ldi_hl_a(void)
 {
 	registers.a = registers.hl;
 	registers.hl++;
 }
 
-// LDD (HL-),A
+// 0x23 INC HL
+void inc_hl(void) {	registers.hl++; }
+
+// 0x2B DEC HL
+void dec_hl(void) {	registers.hl--; }
+
+// 0x32 LDD (HL-),A
 void ldd_hl_a(void)
 {
 	registers.a = registers.hl;
 	registers.hl--;
 }
 
-// INC HL
-void inc_hl(void) {	registers.hl++; }
-
-// DEC HL
-void dec_hl(void) {	registers.hl--; }
-
 
 ////
 //	SP
 ////
 
-// LD SP,nn
+// 0x31 LD SP,nn
 void ld_sp_nn(uint16_t operand) { registers.sp = operand; }
 
-// INC SP
+// 0x33 INC SP
 void inc_sp(void) { registers.sp++; }
 
-// DEC SP
+// 0x3B DEC SP
 void dec_sp(void) { registers.sp--; }
