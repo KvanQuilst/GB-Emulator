@@ -47,7 +47,7 @@ const struct instruction instr[256] =
     {"LD D,0x%02x", 1, ld_d_n, 2},		// 0x16
     {"RLA", 0, undefined, 1},			// 0X17
     {"JR 0x%02x", 1, undefined, 3},		// 0x18
-    {"ADD HL,DE", 0, undefined, 2},		// 0x19
+    {"ADD HL,DE", 0, add_hl_de, 2},		// 0x19
     {"LD A,(DE)", 0, undefined, 2},		// 0x1A
     {"DEC DE", 0, dec_de, 2},			// 0x1B
     {"INC E", 0, inc_e, 1},				// 0x1C
@@ -63,7 +63,7 @@ const struct instruction instr[256] =
     {"LD H,0x%02x", 1, ld_h_n, 2},		// 0x26
     {"DAA", 0, undefined, 1},			// 0x27
     {"JR Z,0x%02x", 1, undefined, 3},	// 0x28 timing is 2 or 3
-    {"ADD HL,HL", 0, undefined, 2},		// 0x29
+    {"ADD HL,HL", 0, add_hl_hl, 2},		// 0x29
     {"LD A,(HL+)", 0, undefined, 2},	// 0x2A
     {"DEC HL", 0, dec_hl, 2},			// 0x2B
     {"INC L", 0, inc_l, 1},				// 0x2C
@@ -79,7 +79,7 @@ const struct instruction instr[256] =
     {"LD (HL),0x%02x", 0, undefined, 3},// 0x36
     {"SCF", 0, undefined, 1},			// 0x37
     {"JR C,0x%02x", 0, undefined, 3},	// 0x38 time is 2 or 3
-    {"ADD HL,SP", 0, undefined, 2},		// 0x39
+    {"ADD HL,SP", 0, add_hl_sp, 2},		// 0x39
     {"LD A,(HL-)", 0, undefined, 2},	// 0x3A
     {"DEC SP", 0, dec_sp, 2},			// 0x3B
     {"INC A", 0, inc_a, 1},				// 0x3C
@@ -459,7 +459,16 @@ static void ld_l_n(uint8_t operand) { registers.l = operand; }
 ////
 
 // 0x09 ADD HL,BC
-static void add_hl_bc(void) { registers.hl = add_nn(registers.hl, registers.bc); }
+static void add_hl_bc(void) 
+{ 
+	registers.hl = add_nn(registers.hl, registers.bc);
+}
+
+// 0x19 ADD HL,DE
+static void add_hl_de(void)
+{
+	registers.hl = add_nn(registers.hl, registers.de);
+}
 
 // 0x21 LD HL,nn
 static void ld_hl_nn(uint16_t operand) { registers.hl = operand; }
@@ -470,11 +479,23 @@ static void ld_hl_nn(uint16_t operand) { registers.hl = operand; }
 // 0x23 INC HL
 static void inc_hl(void) {	registers.hl++; }
 
+// 0x29 ADD HL,HL
+static void add_hl_hl(void)
+{
+	registers.hl = add_nn(registers.hl, registers.hl);
+}
+
 // 0x2B DEC HL
 static void dec_hl(void) {	registers.hl--; }
 
 // 0x32 LDD (HL-),A
 //static void ldd_hl_a(void) { }
+
+// 0x39 ADD HL,SP
+static void add_hl_sp(void)
+{
+	registers.hl = add_nn(registers.hl, registers.sp);
+}
 
 
 ////

@@ -52,10 +52,13 @@ static void dec_l(void);
 static void ld_l_n(uint8_t operand);
 
 static void add_hl_bc(void);
+static void add_hl_de(void);
 static void ld_hl_nn(uint16_t operand);
 //static void ldi_hl_a(void);
 static void inc_hl(void);
+static void add_hl_hl(void);
 static void dec_hl(void);
+static void add_hl_sp(void);
 //static void ldd_hl_a(void);
 
 static void ld_sp_nn(uint16_t operand);
