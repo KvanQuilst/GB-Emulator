@@ -5,6 +5,7 @@
  * 
  */
 
+#include "instructions.h"
 #include "registers.h"
 
 #include "cpu.h"
@@ -24,7 +25,7 @@ struct instruction
 const struct instruction instructions[256] =
 {
     {"nop", 0, nop, 1},					// 0x00
-    {"LD BC,0x%04x", 2, undefined, 3},	// 0x01 
+    {"LD BC,0x%04x", 2, ld_bc_nn, 3},	// 0x01 
     {"LD (BC),A", 0, undefined, 2},		// 0x02
     {"INC BC", 0, inc_bc, 2},			// 0x03
     {"INC B", 0, inc_b, 1},				// 0x04
@@ -40,7 +41,7 @@ const struct instruction instructions[256] =
     {"LD C,0x%02x", 1, ld_c_n, 2},		// 0x0E
     {"RRCA", 0, undefined, 1},          // 0x0F
     {"STOP 0x%02x", 1, undefined, 1},   // 0x10
-    {"LD DE,0x%04x", 2, undefined, 3},  // 0x11
+    {"LD DE,0x%04x", 2, ld_de_nn, 3},	// 0x11
     {"LD (DE),A", 0, undefined, 2},     // 0x12
     {"INC DE", 0, inc_de, 2},	        // 0x13
     {"INC D", 0, inc_d, 1},				// 0x14
@@ -56,8 +57,8 @@ const struct instruction instructions[256] =
     {"LD E,0x%02x", 1, ld_e_n, 2},		// 0x1E
     {"nop", 0, undefined, 1},			// 0x1F
     {"nop", 0, undefined, 3},			// 0x20 timing is 2 or 3
-    {"nop", 0, undefined, 1},			// 0x21
-    {"nop", 0, undefined, 1},			// 0X22
+    {"LD HL,0x%04x", 2, ld_hl_nn, 3},	// 0x21
+    {"LD (HL+),A", 0, ldi_hl_a, 2},		// 0X22
     {"INC HL", 0, inc_hl, 2},			// 0x23
     {"INC H", 0, inc_h, 1},				// 0x24
     {"DEC H", 0, dec_h, 1},				// 0x25
@@ -72,8 +73,8 @@ const struct instruction instructions[256] =
     {"LD L,0x%02x", 1, ld_l_n, 2},      // 0x2E
     {"nop", 0, undefined, 1},           // 0x2F
     {"nop", 0, undefined, 1},           // 0x30
-    {"nop", 0, undefined, 1},           // 0x31
-    {"nop", 0, undefined, 1},			// 0x32
+    {"LD SP,0x%04x", 2, ld_sp_nn, 3},   // 0x31
+    {"LD (HL-),A", 0, undefined, 2},	// 0x32
     {"INC SP", 0, inc_sp, 2},			// 0x33
     {"INC (HL)", 0, undefined, 3},		// 0x34
     {"DEC (HL)", 0, undefined, 3},		// 0x35
@@ -364,6 +365,9 @@ void ld_c_n(uint8_t operand) { registers.c = operand; }
 //	BC
 ////
 
+// LD BC,nn
+void ld_bc_nn(uint16_t operand) { registers.bc = operand; }
+
 // INC BC
 void inc_bc(void) { registers.bc++; }
 
@@ -426,6 +430,9 @@ void ld_e_n(uint8_t operand) { registers.e = operand; }
 ////
 //	DE
 ////
+
+// LD DE,nn
+void ld_de_nn(uint16_t operand) { registers.de = operand; }
 
 // INC DE
 void inc_de(void) {	registers.de++; }
@@ -490,8 +497,39 @@ void ld_l_n(uint8_t operand) { registers.l = operand; }
 //	HL
 ////
 
+// LD HL,nn
+void ld_hl_nn(uint16_t operand) { registers.hl = operand; }
+
+// LD (HL+),A
+void ldi_hl_a(void)
+{
+	registers.a = registers.hl;
+	registers.hl++;
+}
+
+// LDD (HL-),A
+void ldd_hl_a(void)
+{
+	registers.a = registers.hl;
+	registers.hl--;
+}
+
 // INC HL
 void inc_hl(void) {	registers.hl++; }
 
 // DEC HL
 void dec_hl(void) {	registers.hl--; }
+
+
+////
+//	SP
+////
+
+// LD SP,nn
+void ld_sp_nn(uint16_t operand) { registers.sp = operand; }
+
+// INC SP
+void inc_sp(void) { registers.sp++; }
+
+// DEC SP
+void dec_sp(void) { registers.sp--; }
