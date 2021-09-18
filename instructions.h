@@ -77,6 +77,15 @@ static void or_l(void);
 //static void or_hla(void);
 static void or_a(void);
 static void or_n(uint8_t operand);
+static void cp_b(void);
+static void cp_c(void);
+static void cp_d(void);
+static void cp_e(void);
+static void cp_h(void);
+static void cp_l(void);
+//static void cp_hla(void);
+static void cp_a(void);
+static void cp_n(uint8_t operand);
 
 static void inc_b(void);
 static void dec_b(void);

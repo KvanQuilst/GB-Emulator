@@ -196,14 +196,14 @@ const struct instruction instr[256] =
     {"OR L", 0, or_l, 1},				// 0xB5
     {"OR (HL)", 0, undefined, 2},		// 0xB6
     {"OR A", 0, or_a, 1},				// 0xB7
-    {"CP B", 0, undefined, 1},			// 0xB8
-    {"CP C", 0, undefined, 1},			// 0xB9
-    {"CP D", 0, undefined, 1},			// 0xBA
-    {"CP E", 0, undefined, 1},			// 0xBB
-    {"CP H", 0, undefined, 1},			// 0xBC
-    {"CP L", 0, undefined, 1},			// 0xBD
+    {"CP B", 0, cp_b, 1},				// 0xB8
+    {"CP C", 0, cp_c, 1},				// 0xB9
+    {"CP D", 0, cp_d, 1},				// 0xBA
+    {"CP E", 0, cp_e, 1},				// 0xBB
+    {"CP H", 0, cp_h, 1},				// 0xBC
+    {"CP L", 0, cp_l, 1},				// 0xBD
     {"CP (HL)", 0, undefined, 2},		// 0xBE
-    {"CP A", 0, undefined, 1},			// 0xBF
+    {"CP A", 0, cp_a, 1},				// 0xBF
     {"RET NZ", 0, undefined, 5},		// 0xC0 timing 2 or 5
     {"POP BC", 0, undefined, 3},		// 0xC1
     {"JP NZ,0x%04x", 2, undefined, 4},	// 0xC2 timing 3 or 4
@@ -266,7 +266,7 @@ const struct instruction instr[256] =
     {"EI", 0, undefined, 1},			// 0xFB
     {"undefined", 0, undefined, 0},		// 0xFC
     {"undefined", 0, undefined, 0},		// 0xFD
-    {"CP 0x%02x", 1, undefined, 2},		// 0xFE
+    {"CP 0x%02x", 1, cp_n, 2},			// 0xFE
     {"RST 38H", 0, undefined, 4}		// 0xFF
 };
 
@@ -371,6 +371,17 @@ static void or(uint8_t val)
 	registers.f &= (ALL_FLAGS);
 	registers.a |= val;
 	registers.f |= (registers.a == 0) * ZERO_FLAG;
+}
+
+// compare val with A and set flags
+// requires: value to compare
+static void cp(uint8_t val)
+{
+	uint8_t result = registers.a - val;
+	registers.f &= (ZERO_FLAG + HALF_FLAG + CARRY_FLAG);
+	registers.f |= (val > registers.a) * CARRY_FLAG
+				+  ((val & 0x0f) > (registers.a & 0x0f)) * HALF_FLAG
+				+  (result == 0) * ZERO_FLAG;
 }
 
 ////
@@ -542,6 +553,32 @@ static void or_a(void) { or(registers.a); }
 
 // 0xF6 OR n
 static void or_n(uint8_t operand) { or(operand); }
+
+// 0xB8 CP B
+static void cp_b(void) { cp(registers.b); }
+
+// 0xB9 CP C
+static void cp_c(void) { cp(registers.c); }
+
+// 0xBA CP D
+static void cp_d(void) { cp(registers.d); }
+
+// 0xBB CP E
+static void cp_e(void) { cp(registers.e); }
+
+// 0xBC CP H
+static void cp_h(void) { cp(registers.h); }
+
+// 0xBD CP L
+static void cp_l(void) { cp(registers.l); }
+
+// 0xBE CP (HL)
+
+// 0xBF CP A
+static void cp_a(void) { cp(registers.a); }
+
+// 0xFE CP n
+static void cp_n(uint8_t operand) { cp(operand); }
 
 
 ////
