@@ -172,14 +172,14 @@ const struct instruction instr[256] =
     {"SBC A,L", 0, undefined, 1},		// 0x9D
     {"SBC A,(HL)", 0, undefined, 2},	// 0x9E
     {"SBC A,A", 0, undefined, 1},		// 0x9F
-    {"AND B", 0, undefined, 1},			// 0xA0
-    {"AND C", 0, undefined, 1},			// 0xA1
-    {"AND D", 0, undefined, 1},			// 0xA2
-    {"AND E", 0, undefined, 1},			// 0xA3
-    {"AND H", 0, undefined, 1},			// 0xA4
-    {"AND L", 0, undefined, 1},			// 0xA5
+    {"AND B", 0, and_b, 1},				// 0xA0
+    {"AND C", 0, and_c, 1},				// 0xA1
+    {"AND D", 0, and_d, 1},				// 0xA2
+    {"AND E", 0, and_e, 1},				// 0xA3
+    {"AND H", 0, and_h, 1},				// 0xA4
+    {"AND L", 0, and_l, 1},				// 0xA5
     {"AND (HL)", 0, undefined, 2},		// 0xA6
-    {"AND A", 0, undefined, 1},			// 0xA7
+    {"AND A", 0, and_a, 1},				// 0xA7
     {"XOR B", 0, undefined, 1},			// 0xA8
     {"XOR C", 0, undefined, 1},			// 0xA9
     {"XOR D", 0, undefined, 1},			// 0xAA
@@ -242,7 +242,7 @@ const struct instruction instr[256] =
     {"undefined", 0, undefined, 0},		// 0xE3
     {"undefined", 0, undefined, 0},		// 0xE4
     {"PUSH HL", 0, undefined, 4},		// 0xE5
-    {"AND 0x%02x", 1, undefined, 2},	// 0xE6
+    {"AND 0x%02x", 1, and_n, 2},		// 0xE6
     {"RST 20H", 0, undefined, 4},		// 0xE7
     {"ADD SP,0x%02x", 1, undefined, 4},	// 0xE8
     {"JP HL", 0, undefined, 1},			// 0xE9
@@ -321,17 +321,6 @@ static void add(uint8_t val)
 	registers.a = (uint8_t) result;
 }
 
-// sub val from A and set flags
-// requires: value to sub
-static void sub(uint8_t val)
-{
-	registers.f &= !(ZERO_FLAG + HALF_FLAG + CARRY_FLAG);
-	registers.f |= (val > registers.a) * CARRY_FLAG
-				+  ((val & 0x0f) > (registers.a & 0x0f)) * HALF_FLAG
-				+  NEG_FLAG;
-	registers.f |= ((registers.a -= val) == 0) * ZERO_FLAG;
-}
-
 // add value to HL and set flags
 // requires: value to add
 static void add_hl(uint16_t val)
@@ -343,6 +332,27 @@ static void add_hl(uint16_t val)
 	registers.f |= (result & 0xffff0000) * CARRY_FLAG
 		+  ((registers.hl & 0x0fff)+(val & 0x0fff)>0x0fff)*HALF_FLAG;
 	registers.hl = (uint16_t) result;
+}
+
+// sub val from A and set flags
+// requires: value to sub
+static void sub(uint8_t val)
+{
+	registers.f &= !(ZERO_FLAG + HALF_FLAG + CARRY_FLAG);
+	registers.f |= (val > registers.a) * CARRY_FLAG
+				+  ((val & 0x0f) > (registers.a & 0x0f)) * HALF_FLAG
+				+  NEG_FLAG;
+	registers.f |= ((registers.a -= val) == 0) * ZERO_FLAG;
+}
+
+// and val with A and set flags; store in A
+// requires: value to and
+static void and(uint8_t val)
+{
+	registers.f &= (ZERO_FLAG + NEG_FLAG + CARRY_FLAG);
+	registers.a &= val;
+	registers.f |= (registers.a == 0) * ZERO_FLAG
+				+  HALF_FLAG;
 }
 
 ////
@@ -436,6 +446,33 @@ static void sub_a(void) { sub(registers.a); }
 
 // 0xD6 SUB n
 static void sub_n(uint8_t operand) { sub(operand); }
+
+// 0xA0 AND B
+static void and_b(void) { and(registers.b); }
+
+// 0xA1 AND C
+static void and_c(void) { and(registers.c); }
+
+// 0xA2 AND D
+static void and_d(void) { and(registers.d); }
+
+// 0xA3 AND E
+static void and_e(void) { and(registers.e); }
+
+// 0xA4 AND H
+static void and_h(void) { and(registers.h); }
+
+// 0xA5 AND L
+static void and_l(void) { and(registers.l); }
+
+// 0xA6 AND (HL)
+
+
+// 0xA7 AND A
+static void and_a(void) { and(registers.a); }
+
+// 0xE6 AND n
+static void and_n(uint8_t operand) { and(operand); }
 
 
 ////
