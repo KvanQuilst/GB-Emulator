@@ -188,14 +188,14 @@ const struct instruction instr[256] =
     {"XOR L", 0, xor_l, 1},				// 0xAD
     {"XOR (HL)", 0, undefined, 2},		// 0xAE
     {"XOR A", 0, xor_a, 1},				// 0xAF
-    {"OR B", 0, undefined, 1},			// 0xB0
-    {"OR C", 0, undefined, 1},			// 0xB1
-    {"OR D", 0, undefined, 1},			// 0xB2
-    {"OR E", 0, undefined, 1},			// 0xB3
-    {"OR H", 0, undefined, 1},			// 0xB4
-    {"OR L", 0, undefined, 1},			// 0xB5
+    {"OR B", 0, or_b, 1},				// 0xB0
+    {"OR C", 0, or_c, 1},				// 0xB1
+    {"OR D", 0, or_d, 1},				// 0xB2
+    {"OR E", 0, or_e, 1},				// 0xB3
+    {"OR H", 0, or_h, 1},				// 0xB4
+    {"OR L", 0, or_l, 1},				// 0xB5
     {"OR (HL)", 0, undefined, 2},		// 0xB6
-    {"OR A", 0, undefined, 1},			// 0xB7
+    {"OR A", 0, or_a, 1},				// 0xB7
     {"CP B", 0, undefined, 1},			// 0xB8
     {"CP C", 0, undefined, 1},			// 0xB9
     {"CP D", 0, undefined, 1},			// 0xBA
@@ -258,7 +258,7 @@ const struct instruction instr[256] =
     {"DI", 0, undefined, 1},			// 0xF3
     {"undefined", 0, undefined, 0},		// 0xF4
     {"PUSH AF", 0, undefined, 4},		// 0xF5
-    {"OR 0x%02x", 1, undefined, 2},		// 0xF6
+    {"OR 0x%02x", 1, or_n, 2},			// 0xF6
     {"RST 30H", 0, undefined, 4},		// 0xF7
     {"LD HL,SP+0x%02x", 1, undefined, 3},// 0xF8
     {"LD HL,SP", 0, undefined, 2},		// 0xF9
@@ -361,6 +361,15 @@ static void xor(uint8_t val)
 {
 	registers.f &= (ALL_FLAGS);
 	registers.a ^= val;
+	registers.f |= (registers.a == 0) * ZERO_FLAG;
+}
+
+// or val with A and set flags; store in A
+// requires: value to or
+static void or(uint8_t val)
+{
+	registers.f &= (ALL_FLAGS);
+	registers.a |= val;
 	registers.f |= (registers.a == 0) * ZERO_FLAG;
 }
 
@@ -507,6 +516,32 @@ static void xor_a(void) { xor(registers.a); }
 
 // 0xEE XOR n
 static void xor_n(uint8_t operand) { xor(operand); }
+
+// 0xB0 OR B
+static void or_b(void) { or(registers.b); }
+
+// 0xB1 OR C
+static void or_c(void) { or(registers.c); }
+
+// 0xB2 OR D
+static void or_d(void) { or(registers.d); }
+
+// 0xB3 OR E
+static void or_e(void) { or(registers.e); }
+
+// 0xB4 OR H
+static void or_h(void) { or(registers.h); }
+
+// 0xB5 OR L
+static void or_l(void) { or(registers.l); }
+
+// 0xB6 OR (HL)
+
+// 0xB7 OR A
+static void or_a(void) { or(registers.a); }
+
+// 0xF6 OR n
+static void or_n(uint8_t operand) { or(operand); }
 
 
 ////

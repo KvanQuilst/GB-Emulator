@@ -20,13 +20,6 @@ struct instruction
 
 static void undefined(void);
 
-static uint8_t inc(uint8_t val);
-static uint8_t dec(uint8_t val);
-static void add(uint8_t val);
-static void add_hl(uint16_t val);
-static void sub(uint8_t val);
-static void and(uint8_t val);
-
 static void nop(void);
 
 static void inc_a(void);
@@ -75,6 +68,15 @@ static void xor_l(void);
 //static void xor_hla(void);
 static void xor_a(void);
 static void xor_n(uint8_t operand);
+static void or_b(void);
+static void or_c(void);
+static void or_d(void);
+static void or_e(void);
+static void or_h(void);
+static void or_l(void);
+//static void or_hla(void);
+static void or_a(void);
+static void or_n(uint8_t operand);
 
 static void inc_b(void);
 static void dec_b(void);
