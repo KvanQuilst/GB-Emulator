@@ -21,6 +21,9 @@ struct instruction
 static void undefined(void);
 
 static void nop(void);
+static void cpl(void);
+static void scf(void);
+static void ccf(void);
 
 static void inc_a(void);
 static void dec_a(void);

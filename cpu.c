@@ -59,7 +59,7 @@ const struct instruction instr[256] =
     {"INC L", 0, inc_l, 1},				// 0x2C
     {"DEC L", 0, dec_l, 1},				// 0x2D
     {"LD L,0x%02x", 1, ld_l_n, 2},      // 0x2E
-    {"CPL", 0, undefined, 1},           // 0x2F
+    {"CPL", 0, cpl, 1},					// 0x2F
     {"JR NC,0x%02x", 0, undefined, 3},  // 0x30 timing is 2 or 3
     {"LD SP,0x%04x", 2, ld_sp_nn, 3},   // 0x31
     {"LD (HL-),A", 0, undefined, 2},	// 0x32
@@ -67,7 +67,7 @@ const struct instruction instr[256] =
     {"INC (HL)", 0, undefined, 3},		// 0x34
     {"DEC (HL)", 0, undefined, 3},		// 0x35
     {"LD (HL),0x%02x", 0, undefined, 3},// 0x36
-    {"SCF", 0, undefined, 1},			// 0x37
+    {"SCF", 0, scf, 1},					// 0x37
     {"JR C,0x%02x", 0, undefined, 3},	// 0x38 time is 2 or 3
     {"ADD HL,SP", 0, add_hl_sp, 2},		// 0x39
     {"LD A,(HL-)", 0, undefined, 2},	// 0x3A
@@ -75,7 +75,7 @@ const struct instruction instr[256] =
     {"INC A", 0, inc_a, 1},				// 0x3C
     {"DEC A", 0, dec_a, 1},				// 0x3D
     {"LD A,0x%02x", 0, ld_a_n, 2},		// 0x3E
-    {"CCF", 0, undefined, 1},			// 0x3F
+    {"CCF", 0, ccf, 1},					// 0x3F
     {"LD B,B", 0, nop, 1},				// 0x40
     {"LD B,C", 0, ld_b_c, 1},			// 0x41
     {"LD B,D", 0, ld_b_d, 1},			// 0x42
@@ -388,8 +388,29 @@ static void cp(uint8_t val)
 //	CPU Instructions
 ////
 
-// 0x00 nop
+// 0x00 NOP
 static void nop(void) {}
+
+// 0x2F CPL
+static void cpl(void)
+{
+	registers.f |= NEG_FLAG + HALF_FLAG;
+	registers.a = !registers.a;
+}
+
+// 0x37 SCF
+static void scf(void)
+{
+	registers.f &= !(NEG_FLAG + HALF_FLAG);
+	regsiters.f |= CARRY_FLAG;
+}
+
+// 0x3F CCF
+static void ccf(void)
+{
+	registers.f &= !(NEG_FLAG + HALF_FLAG);
+	regsiters.f ^= CARRY_FLAG;
+}
 
 ////
 //	A
