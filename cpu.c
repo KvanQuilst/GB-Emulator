@@ -244,7 +244,7 @@ const struct instruction instr[256] =
     {"PUSH HL", 0, undefined, 4},		// 0xE5
     {"AND 0x%02x", 1, and_n, 2},		// 0xE6
     {"RST 20H", 0, undefined, 4},		// 0xE7
-    {"ADD SP,0x%02x", 1, undefined, 4},	// 0xE8
+    {"ADD SP,0x%02x", 1, add_sp, 4},	// 0xE8
     {"JP HL", 0, undefined, 1},			// 0xE9
     {"LD (0x%04x),A", 2, undefined, 3},	// 0xEA
     {"undefined", 0, undefined, 0},		// 0xEB
@@ -330,7 +330,7 @@ static void add_hl(uint16_t val)
 	// clear NEG_, HALF_ and CARRY_FLAG
 	registers.f &= !(NEG_FLAG + HALF_FLAG + CARRY_FLAG);
 	registers.f |= (result & 0xffff0000) * CARRY_FLAG
-		+  ((registers.hl & 0x0fff)+(val & 0x0fff)>0x0fff)*HALF_FLAG;
+		+ ((registers.hl & 0x0fff)+(val & 0x0fff)>0x0fff)*HALF_FLAG;
 	registers.hl = (uint16_t) result;
 }
 
@@ -349,7 +349,7 @@ static void sub(uint8_t val)
 // requires: value to and
 static void and(uint8_t val)
 {
-	registers.f &= (ZERO_FLAG + NEG_FLAG + CARRY_FLAG);
+	registers.f &= !(ZERO_FLAG + NEG_FLAG + CARRY_FLAG);
 	registers.a &= val;
 	registers.f |= (registers.a == 0) * ZERO_FLAG
 				+  HALF_FLAG;
@@ -359,7 +359,7 @@ static void and(uint8_t val)
 // requires: value to xor
 static void xor(uint8_t val)
 {
-	registers.f &= (ALL_FLAGS);
+	registers.f &= !(ALL_FLAGS);
 	registers.a ^= val;
 	registers.f |= (registers.a == 0) * ZERO_FLAG;
 }
@@ -368,7 +368,7 @@ static void xor(uint8_t val)
 // requires: value to or
 static void or(uint8_t val)
 {
-	registers.f &= (ALL_FLAGS);
+	registers.f &= !(ALL_FLAGS);
 	registers.a |= val;
 	registers.f |= (registers.a == 0) * ZERO_FLAG;
 }
@@ -378,7 +378,7 @@ static void or(uint8_t val)
 static void cp(uint8_t val)
 {
 	uint8_t result = registers.a - val;
-	registers.f &= (ZERO_FLAG + HALF_FLAG + CARRY_FLAG);
+	registers.f &= !(ZERO_FLAG + HALF_FLAG + CARRY_FLAG);
 	registers.f |= (val > registers.a) * CARRY_FLAG
 				+  ((val & 0x0f) > (registers.a & 0x0f)) * HALF_FLAG
 				+  (result == 0) * ZERO_FLAG;
@@ -857,3 +857,13 @@ static void inc_sp(void) { registers.sp++; }
 
 // 0x3B DEC SP
 static void dec_sp(void) { registers.sp--; }
+
+// 0xE8 ADD SP,n
+static void add_sp(uint8_t val)
+{
+	uint32_t result = registers.sp + val;
+	registers.f &= !(ALL_FLAGS);
+	registers.f |= (result & 0xffff0000) * CARRY_FLAG
+		+ ((registers.sp & 0x0fff)+(val & 0x0fff)>0x0fff)*HALF_FLAG;
+	registers.sp = (uint16_t) result;
+}

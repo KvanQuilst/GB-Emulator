@@ -174,3 +174,4 @@ static void add_hl_sp(void);
 static void ld_sp_nn(uint16_t operand);
 static void inc_sp(void);
 static void dec_sp(void);
+static void add_sp(uint8_t val);
