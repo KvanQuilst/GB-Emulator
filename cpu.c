@@ -402,14 +402,14 @@ static void cpl(void)
 static void scf(void)
 {
 	registers.f &= !(NEG_FLAG + HALF_FLAG);
-	regsiters.f |= CARRY_FLAG;
+	registers.f |= CARRY_FLAG;
 }
 
 // 0x3F CCF
 static void ccf(void)
 {
 	registers.f &= !(NEG_FLAG + HALF_FLAG);
-	regsiters.f ^= CARRY_FLAG;
+	registers.f ^= CARRY_FLAG;
 }
 
 ////
