@@ -140,14 +140,14 @@ const struct instruction instr[256] =
     {"LD A,L", 0, ld_a_l, 1},			// 0x7D
     {"LD A,(HL)", 0, undefined, 2},		// 0x7E
     {"LD A,A", 0, nop, 1},				// 0x7F
-    {"ADD A,B", 0, add_a_b, 1},			// 0x80
-    {"ADD A,C", 0, add_a_c, 1},			// 0x81
-    {"ADD A,D", 0, add_a_d, 1},			// 0x82
-    {"ADD A,E", 0, add_a_e, 1},			// 0x83
-    {"ADD A,H", 0, add_a_h, 1},			// 0x84
-    {"ADD A,L", 0, add_a_l, 1},			// 0x85
+    {"ADD A,B", 0, add_b, 1},			// 0x80
+    {"ADD A,C", 0, add_c, 1},			// 0x81
+    {"ADD A,D", 0, add_d, 1},			// 0x82
+    {"ADD A,E", 0, add_e, 1},			// 0x83
+    {"ADD A,H", 0, add_h, 1},			// 0x84
+    {"ADD A,L", 0, add_l, 1},			// 0x85
     {"ADD A,(HL)", 0, undefined, 2},	// 0x86
-    {"ADD A,A", 0, add_a_a, 1},			// 0x87
+    {"ADD A,A", 0, add_a, 1},			// 0x87
     {"ADC A,B", 0, undefined, 1},		// 0x88
     {"ADC A,C", 0, undefined, 1},		// 0x89
     {"ADC A,D", 0, undefined, 1},		// 0x8A
@@ -156,14 +156,14 @@ const struct instruction instr[256] =
     {"ADC A,L", 0, undefined, 1},		// 0x8D
     {"ADC A,(HL)", 0, undefined, 2},	// 0x8E
     {"ADC A,A", 0, undefined, 1},		// 0x8F
-    {"SUB B", 0, undefined, 1},			// 0x90
-    {"SUB C", 0, undefined, 1},			// 0x91
-    {"SUB D", 0, undefined, 1},			// 0x92
-    {"SUB E", 0, undefined, 1},			// 0x93
-    {"SUB H", 0, undefined, 1},			// 0x94
-    {"SUB L", 0, undefined, 1},			// 0x95
+    {"SUB B", 0, sub_b, 1},				// 0x90
+    {"SUB C", 0, sub_c, 1},				// 0x91
+    {"SUB D", 0, sub_d, 1},				// 0x92
+    {"SUB E", 0, sub_e, 1},				// 0x93
+    {"SUB H", 0, sub_h, 1},				// 0x94
+    {"SUB L", 0, sub_l, 1},				// 0x95
     {"SUB (HL)", 0, undefined, 2},		// 0x96
-    {"SUB A", 0, undefined, 1},			// 0x97
+    {"SUB A", 0, sub_a, 1},				// 0x97
     {"SBC A,B", 0, undefined, 1},		// 0x98
     {"SBC A,C", 0, undefined, 1},		// 0x99
     {"SBC A,D", 0, undefined, 1},		// 0x9A
@@ -210,7 +210,7 @@ const struct instruction instr[256] =
     {"JP 0x%04x", 2, undefined, 3},		// 0xC3
     {"CALL NZ,0x%04x", 2, undefined, 6},// 0xC4 timing 3 or 6
     {"PUSH BC", 0, undefined, 4},		// 0xC5
-    {"ADD A,0x%02x", 1, undefined, 2},	// 0xC6
+    {"ADD A,0x%02x", 1, add_n, 2},		// 0xC6
     {"RST 00H", 0, undefined, 4},		// 0xC7
     {"RET Z", 0, undefined, 5},			// 0xC8 timing 2 or 5
     {"RET", 0, undefined, 4},			// 0xC9
@@ -226,7 +226,7 @@ const struct instruction instr[256] =
     {"undefined", 0, undefined, 0},		// 0xD3
     {"CALL NC,0x%04x", 2, undefined, 6},// 0xD4 timing 3 or 6
     {"PUSH DE", 0, undefined, 4},		// 0xD5
-    {"SUB 0x%02x", 1, undefined, 2},	// 0xD6
+    {"SUB 0x%02x", 1, sub_n, 2},		// 0xD6
     {"RST 10H", 0, undefined, 4},		// 0xD7
     {"RET C", 0, undefined, 5},			// 0xD8	timing 2 or 5
     {"RETI", 0, undefined, 4},			// 0xD9
@@ -287,7 +287,7 @@ static uint8_t inc(uint8_t val)
 {
 
 	// unset NEG_ and HALF_FLAG
-	registers.f &= !(NEG_FLAG + HALF_FLAG); 	
+	registers.f &= !(ZERO_FLAG + NEG_FLAG + HALF_FLAG); 	
 	registers.f |= ((val & 0x0f) == 0x0f) * HALF_FLAG;
 	val++;
 	registers.f |= (val == 0) * ZERO_FLAG;
@@ -299,7 +299,7 @@ static uint8_t inc(uint8_t val)
 // returns: decreased value
 static uint8_t dec(uint8_t val)
 {
-	registers.f &= !(HALF_FLAG);
+	registers.f &= !(ZERO_FLAG + HALF_FLAG);
 	registers.f |= (val & 0x0f) * HALF_FLAG;
 	val--;
 	registers.f |= (val == 0) * ZERO_FLAG
@@ -307,32 +307,41 @@ static uint8_t dec(uint8_t val)
 	return val;
 }
 
-// add two 1 byte values and set flags
-// store in the first val address
-// requires: values to add together
-static void add(uint8_t val2)
+// add val to A and set flags
+// requires: value to add
+static void add(uint8_t val)
 {
-	uint16_t result = registers.a + val2;
+	uint16_t result = registers.a + val;
 	
 	// clear NEG_, HALF_, and CARRY_FLAG
-	registers.f &= !(NEG_FLAG + HALF_FLAG + CARRY_FLAG);
+	registers.f &= !(ALL_FLAGS);
 	registers.f |= ((uint8_t) result == 0) * ZERO_FLAG
 				+  (result & 0xff00) * CARRY_FLAG
-				+  ((registers.a & 0x0f)+(val2&0x0f)>0x0f) * HALF_FLAG;
+				+  ((registers.a & 0x0f)+(val&0x0f)>0x0f) * HALF_FLAG;
 	registers.a = (uint8_t) result;
 }
 
-// add two 2 byte values and set flags
-// requires: values to add together
-// returns: final value
-static void add_hl(uint16_t val2)
+// sub val from A and set flags
+// requires: value to sub
+static void sub(uint8_t val)
 {
-	uint32_t result = registers.hl + val2;
+	registers.f &= !(ZERO_FLAG + HALF_FLAG + CARRY_FLAG);
+	registers.f |= (val > registers.a) * CARRY_FLAG
+				+  ((val & 0x0f) > (registers.a & 0x0f)) * HALF_FLAG
+				+  NEG_FLAG;
+	registers.f |= ((registers.a -= val) == 0) * ZERO_FLAG;
+}
+
+// add value to HL and set flags
+// requires: value to add
+static void add_hl(uint16_t val)
+{
+	uint32_t result = registers.hl + val;
 
 	// clear NEG_, HALF_ and CARRY_FLAG
 	registers.f &= !(NEG_FLAG + HALF_FLAG + CARRY_FLAG);
 	registers.f |= (result & 0xffff0000) * CARRY_FLAG
-		+  ((registers.hl & 0x0fff)+(val2 & 0x0fff)>0x0fff)*HALF_FLAG;
+		+  ((registers.hl & 0x0fff)+(val & 0x0fff)>0x0fff)*HALF_FLAG;
 	registers.hl = (uint16_t) result;
 }
 
@@ -377,27 +386,56 @@ static void ld_a_l(void) { registers.a = registers.l; }
 // 0x7E LD A,(HL)
 
 // 0x80 ADD A,B
-static void add_a_b(void) { add(registers.b); }
+static void add_b(void) { add(registers.b); }
 
 // 0x81 ADD A,C
-static void add_a_c(void) { add(registers.c); }
+static void add_c(void) { add(registers.c); }
 
 // 0x82 ADD A,D
-static void add_a_d(void) { add(registers.d); }
+static void add_d(void) { add(registers.d); }
 
 // 0x83 ADD A,E
-static void add_a_e(void) { add(registers.e); }
+static void add_e(void) { add(registers.e); }
 
 // 0x84 ADD A,H
-static void add_a_h(void) { add(registers.h); }
+static void add_h(void) { add(registers.h); }
 
 // 0x85 ADD A,L
-static void add_a_l(void) { add(registers.h); }
+static void add_l(void) { add(registers.h); }
 
 // 0x86 ADD A,(HL)
 
 // 0x86 ADD A,A
-static void add_a_a(void) { add(registers.a); }
+static void add_a(void) { add(registers.a); }
+
+// 0xC6 ADD A,n
+static void add_n(uint8_t operand) { add(operand); }
+
+// 0x90 SUB B
+static void sub_b(void) { sub(registers.b); }
+
+// 0x91 SUB C
+static void sub_c(void) { sub(registers.c); }
+
+// 0x92 SUB D
+static void sub_d(void) { sub(registers.d); }
+
+// 0x93 SUB E
+static void sub_e(void) { sub(registers.e); }
+
+// 0x94 SUB H
+static void sub_h(void) { sub(registers.h); }
+
+// 0x95 SUB L
+static void sub_l(void) { sub(registers.l); }
+
+// 0x96 SUB (HL)
+
+// 0x97 SUB A
+static void sub_a(void) { sub(registers.a); }
+
+// 0xD6 SUB n
+static void sub_n(uint8_t operand) { sub(operand); }
 
 
 ////
