@@ -140,14 +140,14 @@ const struct instruction instr[256] =
     {"LD A,L", 0, ld_a_l, 1},			// 0x7D
     {"LD A,(HL)", 0, undefined, 2},		// 0x7E
     {"LD A,A", 0, nop, 1},				// 0x7F
-    {"ADD A,B", 0, undefined, 1},		// 0x80
-    {"ADD A,C", 0, undefined, 1},		// 0x81
-    {"ADD A,D", 0, undefined, 1},		// 0x82
-    {"ADD A,E", 0, undefined, 1},		// 0x83
-    {"ADD A,H", 0, undefined, 1},		// 0x84
-    {"ADD A,L", 0, undefined, 1},		// 0x85
+    {"ADD A,B", 0, add_a_b, 1},			// 0x80
+    {"ADD A,C", 0, add_a_c, 1},			// 0x81
+    {"ADD A,D", 0, add_a_d, 1},			// 0x82
+    {"ADD A,E", 0, add_a_e, 1},			// 0x83
+    {"ADD A,H", 0, add_a_h, 1},			// 0x84
+    {"ADD A,L", 0, add_a_l, 1},			// 0x85
     {"ADD A,(HL)", 0, undefined, 2},	// 0x86
-    {"ADD A,A", 0, undefined, 1},		// 0x87
+    {"ADD A,A", 0, add_a_a, 1},			// 0x87
     {"ADC A,B", 0, undefined, 1},		// 0x88
     {"ADC A,C", 0, undefined, 1},		// 0x89
     {"ADC A,D", 0, undefined, 1},		// 0x8A
@@ -285,7 +285,9 @@ static void undefined(void)
 // returns: increased value
 static uint8_t inc(uint8_t val)
 {
-	registers.f &= !(SUB_FLAG + HALF_FLAG); // unset SUB_ and HALF_FLAG
+
+	// unset NEG_ and HALF_FLAG
+	registers.f &= !(NEG_FLAG + HALF_FLAG); 	
 	registers.f |= ((val & 0x0f) == 0x0f) * HALF_FLAG;
 	val++;
 	registers.f |= (val == 0) * ZERO_FLAG;
@@ -301,22 +303,37 @@ static uint8_t dec(uint8_t val)
 	registers.f |= (val & 0x0f) * HALF_FLAG;
 	val--;
 	registers.f |= (val == 0) * ZERO_FLAG
-				+  SUB_FLAG;
+				+  NEG_FLAG;
 	return val;
 }
 
-// add two 2byte values and set flags
+// add two 1 byte values and set flags
+// store in the first val address
+// requires: values to add together
+static void add(uint8_t val2)
+{
+	uint16_t result = registers.a + val2;
+	
+	// clear NEG_, HALF_, and CARRY_FLAG
+	registers.f &= !(NEG_FLAG + HALF_FLAG + CARRY_FLAG);
+	registers.f |= ((uint8_t) result == 0) * ZERO_FLAG
+				+  (result & 0xff00) * CARRY_FLAG
+				+  ((registers.a & 0x0f)+(val2&0x0f)>0x0f) * HALF_FLAG;
+	registers.a = (uint8_t) result;
+}
+
+// add two 2 byte values and set flags
 // requires: values to add together
 // returns: final value
-static uint16_t add_nn(uint16_t val1, uint16_t val2)
+static void add_hl(uint16_t val2)
 {
-	uint32_t result = val1 + val2;
+	uint32_t result = registers.hl + val2;
 
-	// clear SUB_, HALF_ and CARRY_FLAG
-	registers.f &= !(SUB_FLAG + HALF_FLAG + CARRY_FLAG);
+	// clear NEG_, HALF_ and CARRY_FLAG
+	registers.f &= !(NEG_FLAG + HALF_FLAG + CARRY_FLAG);
 	registers.f |= (result & 0xffff0000) * CARRY_FLAG
-				+  ((val1 & 0x0fff) + (val2 & 0x0fff) > 0x0fff) * HALF_FLAG;
-	return (uint16_t) (result & 0xffff);
+		+  ((registers.hl & 0x0fff)+(val2 & 0x0fff)>0x0fff)*HALF_FLAG;
+	registers.hl = (uint16_t) result;
 }
 
 ////
@@ -358,6 +375,29 @@ static void ld_a_h(void) { registers.a = registers.h; }
 static void ld_a_l(void) { registers.a = registers.l; }
 
 // 0x7E LD A,(HL)
+
+// 0x80 ADD A,B
+static void add_a_b(void) { add(registers.b); }
+
+// 0x81 ADD A,C
+static void add_a_c(void) { add(registers.c); }
+
+// 0x82 ADD A,D
+static void add_a_d(void) { add(registers.d); }
+
+// 0x83 ADD A,E
+static void add_a_e(void) { add(registers.e); }
+
+// 0x84 ADD A,H
+static void add_a_h(void) { add(registers.h); }
+
+// 0x85 ADD A,L
+static void add_a_l(void) { add(registers.h); }
+
+// 0x86 ADD A,(HL)
+
+// 0x86 ADD A,A
+static void add_a_a(void) { add(registers.a); }
 
 
 ////
@@ -597,16 +637,10 @@ static void ld_l_a(void) { registers.l = registers.a; }
 ////
 
 // 0x09 ADD HL,BC
-static void add_hl_bc(void) 
-{ 
-	registers.hl = add_nn(registers.hl, registers.bc);
-}
+static void add_hl_bc(void) { add_hl(registers.bc); }
 
 // 0x19 ADD HL,DE
-static void add_hl_de(void)
-{
-	registers.hl = add_nn(registers.hl, registers.de);
-}
+static void add_hl_de(void) { add_hl(registers.de); }
 
 // 0x21 LD HL,nn
 static void ld_hl_nn(uint16_t operand) { registers.hl = operand; }
@@ -615,13 +649,10 @@ static void ld_hl_nn(uint16_t operand) { registers.hl = operand; }
 //static void ldi_hl_a(void) { }
 
 // 0x23 INC HL
-static void inc_hl(void) {	registers.hl++; }
+static void inc_hl(void) {registers.hl++; }
 
 // 0x29 ADD HL,HL
-static void add_hl_hl(void)
-{
-	registers.hl = add_nn(registers.hl, registers.hl);
-}
+static void add_hl_hl(void) { add_hl(registers.hl); }
 
 // 0x2B DEC HL
 static void dec_hl(void) {	registers.hl--; }
@@ -630,10 +661,7 @@ static void dec_hl(void) {	registers.hl--; }
 //static void ldd_hl_a(void) { }
 
 // 0x39 ADD HL,SP
-static void add_hl_sp(void)
-{
-	registers.hl = add_nn(registers.hl, registers.sp);
-}
+static void add_hl_sp(void) { add_hl(registers.sp); }
 
 
 ////

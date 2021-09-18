@@ -22,7 +22,8 @@ static void undefined(void);
 
 static uint8_t inc(uint8_t val);
 static uint8_t dec(uint8_t val);
-static uint16_t add_nn(uint16_t val1, uint16_t val2);
+static void add(uint8_t val2);
+static void add_hl(uint16_t val2);
 
 static void nop(void);
 
@@ -36,6 +37,14 @@ static void ld_a_e(void);
 static void ld_a_h(void);
 static void ld_a_l(void);
 //static void ld_a_hla(void);
+static void add_a_b(void);
+static void add_a_c(void);
+static void add_a_d(void);
+static void add_a_e(void);
+static void add_a_h(void);
+static void add_a_l(void);
+//static void add_a_hla(void);
+static void add_a_a(void);
 
 static void inc_b(void);
 static void dec_b(void);
