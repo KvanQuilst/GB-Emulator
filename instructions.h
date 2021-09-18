@@ -66,6 +66,15 @@ static void and_l(void);
 //static void and_hla(void);
 static void and_a(void);
 static void and_n(uint8_t operand);
+static void xor_b(void);
+static void xor_c(void);
+static void xor_d(void);
+static void xor_e(void);
+static void xor_h(void);
+static void xor_l(void);
+//static void xor_hla(void);
+static void xor_a(void);
+static void xor_n(uint8_t operand);
 
 static void inc_b(void);
 static void dec_b(void);

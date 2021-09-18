@@ -180,14 +180,14 @@ const struct instruction instr[256] =
     {"AND L", 0, and_l, 1},				// 0xA5
     {"AND (HL)", 0, undefined, 2},		// 0xA6
     {"AND A", 0, and_a, 1},				// 0xA7
-    {"XOR B", 0, undefined, 1},			// 0xA8
-    {"XOR C", 0, undefined, 1},			// 0xA9
-    {"XOR D", 0, undefined, 1},			// 0xAA
-    {"XOR E", 0, undefined, 1},			// 0xAB
-    {"XOR H", 0, undefined, 1},			// 0xAC
-    {"XOR L", 0, undefined, 1},			// 0xAD
+    {"XOR B", 0, xor_b, 1},				// 0xA8
+    {"XOR C", 0, xor_c, 1},				// 0xA9
+    {"XOR D", 0, xor_d, 1},				// 0xAA
+    {"XOR E", 0, xor_e, 1},				// 0xAB
+    {"XOR H", 0, xor_h, 1},				// 0xAC
+    {"XOR L", 0, xor_l, 1},				// 0xAD
     {"XOR (HL)", 0, undefined, 2},		// 0xAE
-    {"XOR A", 0, undefined, 1},			// 0xAF
+    {"XOR A", 0, xor_a, 1},				// 0xAF
     {"OR B", 0, undefined, 1},			// 0xB0
     {"OR C", 0, undefined, 1},			// 0xB1
     {"OR D", 0, undefined, 1},			// 0xB2
@@ -250,7 +250,7 @@ const struct instruction instr[256] =
     {"undefined", 0, undefined, 0},		// 0xEB
     {"undefined", 0, undefined, 0},		// 0xEC
     {"undefined", 0, undefined, 0},		// 0xED
-    {"XOR 0x%02x", 1, undefined, 2},	// 0xEE
+    {"XOR 0x%02x", 1, xor_n, 2},		// 0xEE
     {"RST 28H", 0, undefined, 2},		// 0xEF
     {"LDH A,(0x%02x)", 1, undefined, 2},// 0xF0
     {"POP AF", 0, undefined, 3},		// 0xF1
@@ -353,6 +353,15 @@ static void and(uint8_t val)
 	registers.a &= val;
 	registers.f |= (registers.a == 0) * ZERO_FLAG
 				+  HALF_FLAG;
+}
+
+// xor val with A and set flags; store in A
+// requires: value to xor
+static void xor(uint8_t val)
+{
+	registers.f &= (ALL_FLAGS);
+	registers.a ^= val;
+	registers.f |= (registers.a == 0) * ZERO_FLAG;
 }
 
 ////
@@ -467,12 +476,37 @@ static void and_l(void) { and(registers.l); }
 
 // 0xA6 AND (HL)
 
-
 // 0xA7 AND A
 static void and_a(void) { and(registers.a); }
 
 // 0xE6 AND n
 static void and_n(uint8_t operand) { and(operand); }
+
+// 0xA8 XOR B
+static void xor_b(void) { xor(registers.b); }
+
+// 0xA9 XOR C
+static void xor_c(void) { xor(registers.c); }
+
+// 0xAA XOR D
+static void xor_d(void) { xor(registers.d); }
+
+// 0xAB XOR E
+static void xor_e(void) { xor(registers.e); }
+
+// 0xAC XOR H
+static void xor_h(void) { xor(registers.h); }
+
+// 0xAD XOR L
+static void xor_l(void) { xor(registers.l); }
+
+// 0xAE XOR (HL)
+
+// 0xAF XOR A
+static void xor_a(void) { xor(registers.a); }
+
+// 0xEE XOR n
+static void xor_n(uint8_t operand) { xor(operand); }
 
 
 ////
