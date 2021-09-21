@@ -24,6 +24,7 @@ uint8_t hram[0x7F];		// high internal ram
 
 uint8_t read_byte(uint8_t address)
 {
+	//printf("read_byte\n");
 	if (address >= HRAM) {
 		return hram[address-HRAM];
 	} else if (address >= IO) {
@@ -35,7 +36,7 @@ uint8_t read_byte(uint8_t address)
 	} else if (address >= SRAM) {
 		return sram[address-SRAM];
 	} else if (address >= VRAM) {
-		return vram[addresss-VRAM];
+		return vram[address-VRAM];
 	} else {
 		return cart[address];
 	}

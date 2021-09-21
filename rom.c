@@ -115,13 +115,7 @@ uint8_t loadROM(char* filename)
 	printf("RAM Size:	%ukB\n\n", ram_size);
 
 	// copy rest of rom into cart
-		
-		// seek to end of header
-	if (fseek(rom, ROM_START, SEEK_SET) == -1) {
-		perror("fseek");
-		fclose(rom);
-		return -1;	
-	}
+	rewind(rom);		
 
 		// read into cart
 	size_t tmp = 0;
