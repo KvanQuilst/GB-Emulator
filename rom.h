@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <stdint.h>
+
 // Locations on ROM for specific data
 #define ROM_TITLE	0x0134
 #define ROM_TYPE	0x0147

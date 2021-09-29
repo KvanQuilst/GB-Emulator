@@ -13,14 +13,14 @@
 
 const struct instruction instr[256] =
 {
-    {"nop",	0, nop, 1},										// 0x00
+    {"nop",	0, nop, 1},											// 0x00
     {"LD	BC,0x%04x", 2, ld_bc_nn, 3},		// 0x01 
     {"LD	(BC),A", 0, undefined, 2},			// 0x02
     {"INC	BC", 0, inc_bc, 2},							// 0x03
     {"INC	B", 0, inc_b, 1},								// 0x04
     {"DEC	B", 0, dec_b, 1},								// 0x05
     {"LD	B,0x%02x", 1, ld_b_n, 2},				// 0x06
-    {"RLCA", 0, undefined, 1},						// 0x07
+    {"RLCA", 0, undefined, 1},							// 0x07
     {"LD	(0x%04x),SP", 2, undefined, 5},	// 0x08
     {"ADD	HL,BC", 0, add_hl_bc, 2},				// 0x09
     {"LD	A,(BC)", 0, undefined, 2},			// 0x0A
@@ -28,15 +28,15 @@ const struct instruction instr[256] =
     {"INC	C", 0, inc_c, 1},								// 0x0C
     {"DEC	C", 0, dec_c, 1},								// 0x0D
     {"LD	C,0x%02x", 1, ld_c_n, 2},				// 0x0E
-    {"RRCA", 0, undefined, 1},						// 0x0F
-    {"STOP	0x%02x", 1, undefined, 1},		// 0x10
+    {"RRCA", 0, undefined, 1},							// 0x0F
+    {"STOP	0x%02x", 1, undefined, 1},			// 0x10
     {"LD	DE,0x%04x", 2, ld_de_nn, 3},		// 0x11
     {"LD	(DE),A", 0, undefined, 2},			// 0x12
     {"INC	DE", 0, inc_de, 2},							// 0x13
     {"INC	D", 0, inc_d, 1},								// 0x14
     {"DEC	D", 0, dec_d, 1},								// 0x15
     {"LD	D,0x%02x", 1, ld_d_n, 2},				// 0x16
-    {"RLA", 0, undefined, 1},							// 0X17
+    {"RLA", 0, undefined, 1},								// 0X17
     {"JR	0x%02x", 1, undefined, 3},			// 0x18
     {"ADD	HL,DE", 0, add_hl_de, 2},				// 0x19
     {"LD	A,(DE)", 0, undefined, 2},			// 0x1A
@@ -44,8 +44,8 @@ const struct instruction instr[256] =
     {"INC	E", 0, inc_e, 1},								// 0x1C
     {"DEC	E", 0, dec_e, 1},								// 0x1D
     {"LD	E,0x%02x", 1, ld_e_n, 2},				// 0x1E
-    {"RRA", 0, undefined, 1},							// 0x1F
-    {"STOP", 0, undefined, 2},						// 0x20
+    {"RRA", 0, undefined, 1},								// 0x1F
+    {"STOP", 0, undefined, 2},							// 0x20
     {"LD	HL,0x%04x", 2, ld_hl_nn, 3},		// 0x21 timing is 2 or 3
     {"LD	(HL+),A", 0, undefined, 2},			// 0X22
     {"INC	HL", 0, inc_hl, 2},							// 0x23

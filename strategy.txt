@@ -38,7 +38,9 @@ ROMs:
   - Header = 16+2+1+1+1+1+1+1+1+1+2 = 28 bytes
 
 Screen:
-  - ncurses?
+  - ncurses ==> double width characters, best with b/w, but possible
+                to have 256-bit color; bg should be white or adjacent
+                assign to a different thread
 
 Audio:
   - 4 channels (stereo)

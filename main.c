@@ -7,6 +7,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "cpu.h"
 #include "registers.h"
@@ -17,8 +18,8 @@ int main(int argc, char **argv)
 	char *filename;		// filename provided from user
 
 	// arg checking
-	if (argc != 2) {
-		fprintf(stderr, "incorrect user of gbemu\n");
+	if (argc < 2) {
+		fprintf(stderr, "incorrect use of gbemu\n");
 		fprintf(stderr, "usage: gbemu <filename>\n");
 		exit(1);
 	}
@@ -35,7 +36,7 @@ int main(int argc, char **argv)
 
 	registers.pc = ROM_START;
 
-	while (registers.pc < ROM_START + 50) {
+	while (registers.pc < ROM_START + 6) {
 		
 		cpu_step();
 
