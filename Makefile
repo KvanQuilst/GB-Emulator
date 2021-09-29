@@ -1,10 +1,23 @@
 # Makefile for gbemu
 
-CC=gcc
-CFLAGS=-Wall
+SDIR		:= src
+IDIR		:= include
+ODIR		:= obs
+CFILES	:= $(wildcard $(SDIR)/*.c)
+OBJS		:= $(patsubst $(SDIR)/%.c, $(ODIR)/%.o, $(CFILES))
+CC			:= gcc
+CFLAGS	:= -g -Wall -iquote $(IDIR)
+LFLAGS	:=
 
-makegbemu: main.c rom.c memory.c cpu.c registers.c
-	$(CC) $(CFLAGS) -o gbemu main.c rom.c memory.c cpu.c registers.c
+gbemu: $(ODIR) $(OBJS)
+	$(CC) $(ODIR)/*.o -o $@ $(LFLAGS)
 
+$(ODIR)/%.o: $(SDIR)/%.c
+	$(CC) -c $(CFLAGS) -o $@ $< 
+
+$(ODIR):
+	@mkdir $@
+
+.PHONY clean:
 clean:
-	rm -f *.o
+	@rm -rf $(ODIR) gbemu
