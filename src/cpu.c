@@ -13,68 +13,68 @@
 const struct instruction instr[256] =
 {
     {"nop",	0, nop, 1},										// 0x00
-    {"LD	BC,0x%04x", 2, ld_bc_nn, 3},		// 0x01 
+    {"LD	BC,nn", 2, ld_bc_nn, 3},				// 0x01 
     {"LD	(BC),A", 0, undefined, 2},			// 0x02
     {"INC	BC", 0, inc_bc, 2},							// 0x03
     {"INC	B", 0, inc_b, 1},								// 0x04
     {"DEC	B", 0, dec_b, 1},								// 0x05
-    {"LD	B,0x%02x", 1, ld_b_n, 2},				// 0x06
+    {"LD	B,n", 1, ld_b_n, 2},						// 0x06
     {"RLCA", 0, undefined, 1},						// 0x07
-    {"LD	(0x%04x),SP", 2, undefined, 5},	// 0x08
+    {"LD	(nn),SP", 2, undefined, 5},			// 0x08
     {"ADD	HL,BC", 0, add_hl_bc, 2},				// 0x09
-    {"LD	A,(BC)", 0, undefined, 2},			// 0x0A
+    {"LD	A,(BC)", 0, ld_a_bc, 2},				// 0x0A
     {"DEC	BC", 0, dec_bc, 2},							// 0x0B
     {"INC	C", 0, inc_c, 1},								// 0x0C
     {"DEC	C", 0, dec_c, 1},								// 0x0D
-    {"LD	C,0x%02x", 1, ld_c_n, 2},				// 0x0E
+    {"LD	C,n", 1, ld_c_n, 2},						// 0x0E
     {"RRCA", 0, undefined, 1},						// 0x0F
-    {"STOP	0x%02x", 1, undefined, 1},		// 0x10
-    {"LD	DE,0x%04x", 2, ld_de_nn, 3},		// 0x11
-    {"LD	(DE),A", 0, undefined, 2},			// 0x12
+    {"STOP	n", 1, undefined, 1},					// 0x10
+    {"LD	DE,nn", 2, ld_de_nn, 3},				// 0x11
+    {"LD	(DE),A", 0, ld_a_de, 2},				// 0x12
     {"INC	DE", 0, inc_de, 2},							// 0x13
     {"INC	D", 0, inc_d, 1},								// 0x14
     {"DEC	D", 0, dec_d, 1},								// 0x15
-    {"LD	D,0x%02x", 1, ld_d_n, 2},				// 0x16
+    {"LD	D,n", 1, ld_d_n, 2},						// 0x16
     {"RLA", 0, undefined, 1},							// 0X17
-    {"JR	0x%02x", 1, undefined, 3},			// 0x18
+    {"JR	n", 1, undefined, 3},						// 0x18
     {"ADD	HL,DE", 0, add_hl_de, 2},				// 0x19
     {"LD	A,(DE)", 0, undefined, 2},			// 0x1A
     {"DEC	DE", 0, dec_de, 2},							// 0x1B
     {"INC	E", 0, inc_e, 1},								// 0x1C
     {"DEC	E", 0, dec_e, 1},								// 0x1D
-    {"LD	E,0x%02x", 1, ld_e_n, 2},				// 0x1E
+    {"LD	E,n", 1, ld_e_n, 2},						// 0x1E
     {"RRA", 0, undefined, 1},							// 0x1F
     {"STOP", 0, undefined, 2},						// 0x20
-    {"LD	HL,0x%04x", 2, ld_hl_nn, 3},		// 0x21 timing is 2 or 3
+    {"LD	HL,nn", 2, ld_hl_nn, 3},				// 0x21 timing is 2 or 3
     {"LD	(HL+),A", 0, undefined, 2},			// 0X22
     {"INC	HL", 0, inc_hl, 2},							// 0x23
     {"INC	H", 0, inc_h, 1},								// 0x24
     {"DEC	H", 0, dec_h, 1},								// 0x25
-    {"LD	H,0x%02x", 1, ld_h_n, 2},				// 0x26
+    {"LD	H,n", 1, ld_h_n, 2},						// 0x26
     {"DAA", 0, undefined, 1},							// 0x27
-    {"JR	Z,0x%02x", 1, undefined, 3},		// 0x28 timing is 2 or 3
+    {"JR	Z,n", 1, undefined, 3},					// 0x28 timing is 2 or 3
     {"ADD	HL,HL", 0, add_hl_hl, 2},				// 0x29
     {"LD	A,(HL+)", 0, undefined, 2},			// 0x2A
     {"DEC	HL", 0, dec_hl, 2},							// 0x2B
     {"INC	L", 0, inc_l, 1},								// 0x2C
     {"DEC	L", 0, dec_l, 1},								// 0x2D
-    {"LD	L,0x%02x", 1, ld_l_n, 2},				// 0x2E
+    {"LD	L,n", 1, ld_l_n, 2},						// 0x2E
     {"CPL", 0, cpl, 1},										// 0x2F
-    {"JR	NC,0x%02x", 0, undefined, 3},		// 0x30 timing is 2 or 3
-    {"LD	SP,0x%04x", 2, ld_sp_nn, 3},		// 0x31
+    {"JR	NC,n", 0, undefined, 3},				// 0x30 timing is 2 or 3
+    {"LD	SP,nn", 2, ld_sp_nn, 3},				// 0x31
     {"LD	(HL-),A", 0, undefined, 2},			// 0x32
     {"INC	SP", 0, inc_sp, 2},							// 0x33
     {"INC	(HL)", 0, undefined, 3},				// 0x34
     {"DEC	(HL)", 0, undefined, 3},				// 0x35
-    {"LD	(HL),0x%02x", 0, undefined, 3},	// 0x36
+    {"LD	(HL),n", 0, undefined, 3},			// 0x36
     {"SCF", 0, scf, 1},										// 0x37
-    {"JR	C,0x%02x", 0, undefined, 3},		// 0x38 time is 2 or 3
+    {"JR	C,n", 0, undefined, 3},					// 0x38 time is 2 or 3
     {"ADD	HL,SP", 0, add_hl_sp, 2},				// 0x39
     {"LD	A,(HL-)", 0, undefined, 2},			// 0x3A
     {"DEC	SP", 0, dec_sp, 2},							// 0x3B
     {"INC	A", 0, inc_a, 1},								// 0x3C
     {"DEC	A", 0, dec_a, 1},								// 0x3D
-    {"LD	A,0x%02x", 0, ld_a_n, 2},				// 0x3E
+    {"LD	A,n", 0, ld_a_n, 2},						// 0x3E
     {"CCF", 0, ccf, 1},										// 0x3F
     {"LD	B,B", 0, nop, 1},								// 0x40
     {"LD	B,C", 0, ld_b_c, 1},						// 0x41
@@ -138,7 +138,7 @@ const struct instruction instr[256] =
     {"LD	A,E", 0, ld_a_e, 1},						// 0x7B
     {"LD	A,H", 0, ld_a_h, 1},						// 0x7C
     {"LD	A,L", 0, ld_a_l, 1},						// 0x7D
-    {"LD	A,(HL)", 0, undefined, 2},			// 0x7E
+    {"LD	A,(HL)", 0, ld_a_hl, 2},				// 0x7E
     {"LD	A,A", 0, nop, 1},								// 0x7F
     {"ADD	A,B", 0, add_b, 1},							// 0x80
     {"ADD	A,C", 0, add_c, 1},							// 0x81
@@ -205,68 +205,68 @@ const struct instruction instr[256] =
     {"CP	(HL)", 0, undefined, 2},				// 0xBE
     {"CP	A", 0, cp_a, 1},								// 0xBF
     {"RET	NZ", 0, undefined, 5},					// 0xC0 timing 2 or 5
-    {"POP	BC", 0, undefined, 3},					// 0xC1
-    {"JP	NZ,0x%04x", 2, undefined, 4},		// 0xC2 timing 3 or 4
-    {"JP	0x%04x", 2, jp_nn, 3},					// 0xC3
-    {"CALL	NZ,0x%04x", 2, undefined, 6},	// 0xC4 timing 3 or 6
+    {"POP	BC", 0, pop_bc, 3},							// 0xC1
+    {"JP	NZ,nn", 2, undefined, 4},				// 0xC2 timing 3 or 4
+    {"JP	nn", 2, jp_nn, 3},							// 0xC3
+    {"CALL	NZ,nn", 2, call_nz, 6},				// 0xC4 timing 3 or 6
     {"PUSH	BC", 0, push_bc, 4},					// 0xC5
-    {"ADD	A,0x%02x", 1, add_n, 2},				// 0xC6
+    {"ADD	A,n", 1, add_n, 2},							// 0xC6
     {"RST	00H", 0, rst_00, 4},						// 0xC7
     {"RET	Z", 0, undefined, 5},						// 0xC8 timing 2 or 5
     {"RET", 0, undefined, 4},							// 0xC9
-    {"JP	Z,0x%04x", 2, undefined, 4},		// 0xCA timing 3 or 4
+    {"JP	Z,nn", 2, undefined, 4},				// 0xCA timing 3 or 4
     {"PREFIX", 0, undefined, 1},					// 0xCB
-    {"CALL	Z,0x%04x", 2, undefined, 6},	// 0xCC timing 3 or 6
-    {"CALL	0x%04x", 2, undefined, 6},		// 0xCD
-    {"ADC	A,0x%02x", 1, undefined, 2},		// 0xCE
+    {"CALL	Z,nn", 2, call_z, 6},					// 0xCC timing 3 or 6
+    {"CALL	nn", 2, call_nn, 6},					// 0xCD
+    {"ADC	A,n", 1, undefined, 2},					// 0xCE
     {"RST	08H", 0, rst_08, 4},						// 0xCF
     {"RET	NC", 0, undefined, 5},					// 0xD0 timing 2 or 5
-    {"POP	DE", 0, undefined, 3},					// 0xD1
-    {"JP	NC,0x%04x", 2, undefined, 4},		// 0xD2 timing 3 or 4
+    {"POP	DE", 0, pop_de, 3},							// 0xD1
+    {"JP	NC,nn", 2, undefined, 4},				// 0xD2 timing 3 or 4
     {"undefined", 0, undefined, 0},				// 0xD3
-    {"CALL	NC,0x%04x", 2, undefined, 6},	// 0xD4 timing 3 or 6
+    {"CALL	NC,nn", 2, call_nc, 6},				// 0xD4 timing 3 or 6
     {"PUSH	DE", 0, push_de, 4},					// 0xD5
-    {"SUB	0x%02x", 1, sub_n, 2},					// 0xD6
+    {"SUB	n", 1, sub_n, 2},								// 0xD6
     {"RST	10H", 0, rst_10, 4},						// 0xD7
     {"RET	C", 0, undefined, 5},						// 0xD8	timing 2 or 5
     {"RETI", 0, undefined, 4},						// 0xD9
-    {"JP	C,0x%04x", 2, undefined, 4},		// 0xDA timing 3 or 4
+    {"JP	C,nn", 2, undefined, 4},				// 0xDA timing 3 or 4
     {"undefined", 0, undefined, 0},				// 0xDB
-    {"CALL	C,0x%04x", 2, undefined, 6},	// 0xDC timing 3 or 6
+    {"CALL	C,nn", 2, call_c, 6},					// 0xDC timing 3 or 6
     {"undefined", 0, undefined, 0},				// 0xDD
-    {"SBC	A,0x%02x", 1, undefined, 2},		// 0xDE
+    {"SBC	A,n", 1, undefined, 2},					// 0xDE
     {"RST	18H", 0, rst_18, 4},						// 0xDF
-    {"LDH	(0x%02x),A", 1, undefined, 3},	// 0xE0
-    {"POP	HL", 0, undefined, 3},					// 0xE1
+    {"LDH	(n),A", 1, ldh_n_a, 3},					// 0xE0
+    {"POP	HL", 0, pop_hl, 3},							// 0xE1
     {"LD	(C),A", 0, undefined, 2},				// 0xE2
     {"undefined", 0, undefined, 0},				// 0xE3
     {"undefined", 0, undefined, 0},				// 0xE4
     {"PUSH	HL", 0, push_hl, 4},					// 0xE5
-    {"AND	0x%02x", 1, and_n, 2},					// 0xE6
+    {"AND	n", 1, and_n, 2},								// 0xE6
     {"RST	20H", 0, rst_20, 4},						// 0xE7
-    {"ADD	SP,0x%02x", 1, add_sp, 4},			// 0xE8
+    {"ADD	SP,n", 1, add_sp, 4},						// 0xE8
     {"JP	HL", 0, undefined, 1},					// 0xE9
-    {"LD	(0x%04x),A", 2, undefined, 3},	// 0xEA
+    {"LD	(nn),A", 2, undefined, 3},			// 0xEA
     {"undefined", 0, undefined, 0},				// 0xEB
     {"undefined", 0, undefined, 0},				// 0xEC
     {"undefined", 0, undefined, 0},				// 0xED
-    {"XOR	0x%02x", 1, xor_n, 2},					// 0xEE
+		{"XOR	n", 1, xor_n, 2},								// 0xEE
     {"RST	28H", 0, rst_28, 2},						// 0xEF
-    {"LDH	A,(0x%02x)", 1, undefined, 2},	// 0xF0
-    {"POP	AF", 0, undefined, 3},					// 0xF1
+    {"LDH	A,(n)", 1, ldh_a_n, 2},					// 0xF0
+    {"POP	AF", 0, pop_af, 3},							// 0xF1
     {"LD	A,(C)", 0, undefined, 2},				// 0xF2
     {"DI", 0, undefined, 1},							// 0xF3
     {"undefined", 0, undefined, 0},				// 0xF4
     {"PUSH	AF", 0, push_af, 4},					// 0xF5
-    {"OR	0x%02x", 1, or_n, 2},						// 0xF6
+    {"OR	n", 1, or_n, 2},								// 0xF6
     {"RST	30H", 0, rst_30, 4},						// 0xF7
-    {"LD	HL,SP+0x%02x", 1, undefined, 3},// 0xF8
+    {"LD	HL,SP+n", 1, undefined, 3},			// 0xF8
     {"LD	HL,SP", 0, undefined, 2},				// 0xF9
-    {"LD	A,(0x%04x)", 2, undefined, 4},	// 0xFA
+    {"LD	A,(nn)", 2, undefined, 4},			// 0xFA
     {"EI", 0, undefined, 1},							// 0xFB
     {"undefined", 0, undefined, 0},				// 0xFC
     {"undefined", 0, undefined, 0},				// 0xFD
-    {"CP	0x%02x", 1, cp_n, 2},						// 0xFE
+    {"CP	n", 1, cp_n, 2},								// 0xFE
     {"RST	38H", 0, rst_38, 4}							// 0xFF
 };
 
@@ -309,7 +309,9 @@ static void undefined(void)
 // requires: val to add to base
 static void rst(uint8_t val)
 {
-	// push_nn(registers.pc);
+	write_stack(registers.pc);
+	registers.sp += 2;
+	registers.pc = val;
 }
 
 // increase values and set flags
@@ -449,6 +451,42 @@ static void ccf(void)
 }
 
 ////
+//	Calls
+////
+
+// 0xC4 CALL NZ,nn
+static void call_nz(uint16_t addr)
+{
+	if (!(registers.f & 0x80)) registers.pc = addr;
+}
+
+// 0xCC CALL Z,nn
+static void call_z(uint16_t addr)
+{
+	if (registers.f & 0x80) registers.pc = addr;
+}
+
+// 0xCD CALL nn
+static void call_nn(uint16_t addr)
+{
+	write_stack(registers.pc);
+	registers.sp -= 2;
+	registers.pc = addr;
+}
+
+// 0xD4 CALL NC,nn
+static void call_nc(uint16_t addr)
+{
+	if (!(registers.f & 0x10)) registers.pc = addr;
+}
+
+// 0xDC CALL C,nn
+static void call_c(uint16_t addr)
+{
+	if (registers.f & 0x10) registers.pc = addr;
+}
+
+////
 //  Restarts
 ////
 
@@ -480,6 +518,12 @@ static void rst_38() { rst(0x38); }
 //	A
 ////
 
+// 0x0A LD A,(BC)
+static void ld_a_bc(void) { ld_a_nn(registers.bc); }
+
+// 0x1A LD A,(DE)
+static void ld_a_de(void) { ld_a_nn(registers.de); }
+
 // 0x3C INC A
 static void inc_a(void) { registers.a = inc(registers.a); }
 
@@ -508,6 +552,7 @@ static void ld_a_h(void) { registers.a = registers.h; }
 static void ld_a_l(void) { registers.a = registers.l; }
 
 // 0x7E LD A,(HL)
+static void ld_a_hl(void) { ld_a_nn(registers.hl); }
 
 // 0x80 ADD A,B
 static void add_b(void) { add(registers.b); }
@@ -661,6 +706,24 @@ static void cp_l(void) { cp(registers.l); }
 
 // 0xBF CP A
 static void cp_a(void) { cp(registers.a); }
+
+// 0xE0 LDH (n),A
+static void ldh_n_a(uint8_t operand)
+{
+	write_byte(0xFF00 + operand, registers.a);
+}
+
+// 0xF0 LDH A,(n)
+static void ldh_a_n(uint8_t operand)
+{
+	registers.a = read_byte(0xFF00 + operand);
+}
+
+// 0xFA LD A,(nn)
+static void ld_a_nn(uint16_t operand)
+{
+	registers.a = read_byte(operand);
+}
 
 // 0xFE CP n
 static void cp_n(uint8_t operand) { cp(operand); }
@@ -943,6 +1006,13 @@ static void inc_sp(void) { registers.sp++; }
 // 0x3B DEC SP
 static void dec_sp(void) { registers.sp--; }
 
+// 0xC1 POP BC
+static void pop_bc(void) 
+{
+	registers.bc = read_stack();
+	registers.sp += 2;
+}
+
 // 0xC5 PUSH BC
 static void push_bc(void) 
 {
@@ -950,11 +1020,25 @@ static void push_bc(void)
 	registers.sp -= 2;
 }
 
+// 0xD1 POP DE
+static void pop_de(void) 
+{
+	registers.de = read_stack();
+	registers.sp += 2;
+}
+
 // 0xD5 PUSH DE
 static void push_de(void) 
 {
 	write_stack(registers.de);
 	registers.sp -= 2;
+}
+
+// 0xE1 POP HL
+static void pop_hl(void) 
+{
+	registers.hl = read_stack();
+	registers.sp += 2;
 }
 
 // 0xE5 PUSH HL
@@ -972,6 +1056,13 @@ static void add_sp(uint8_t val)
 	registers.f |= (result & 0xffff0000) * CARRY_FLAG
 		+ ((registers.sp & 0x0fff)+(val & 0x0fff)>0x0fff)*HALF_FLAG;
 	registers.sp = (uint16_t) result;
+}
+
+// 0xF1 POP AF
+static void pop_af(void) 
+{
+	registers.af = read_stack();
+	registers.sp += 2;
 }
 
 // 0xF5 PUSH AF

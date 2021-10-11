@@ -26,6 +26,13 @@ static void cpl(void);
 static void scf(void);
 static void ccf(void);
 
+// Calls
+static void call_nn(uint16_t addr);
+static void call_nz(uint16_t addr);
+static void call_z(uint16_t addr);
+static void call_nc(uint16_t addr);
+static void call_c(uint16_t addr);
+
 // Restarts
 static void rst_00(void);
 static void rst_08(void);
@@ -37,6 +44,8 @@ static void rst_30(void);
 static void rst_38(void);
 
 // A
+static void ld_a_bc(void);
+static void ld_a_de(void);
 static void inc_a(void);
 static void dec_a(void);
 static void ld_a_n(uint8_t operand);
@@ -46,14 +55,14 @@ static void ld_a_d(void);
 static void ld_a_e(void);
 static void ld_a_h(void);
 static void ld_a_l(void);
-//static void ld_a_hla(void);
+static void ld_a_hl(void);
 static void add_b(void);
 static void add_c(void);
 static void add_d(void);
 static void add_e(void);
 static void add_h(void);
 static void add_l(void);
-//static void add_hla(void);
+//static void add_hl(void);
 static void add_a(void);
 static void add_n(uint8_t operand);
 static void sub_b(void);
@@ -62,7 +71,7 @@ static void sub_d(void);
 static void sub_e(void);
 static void sub_h(void);
 static void sub_l(void);
-//static void sub_hla(void);
+//static void sub_hl(void);
 static void sub_a(void);
 static void sub_n(uint8_t operand);
 static void and_b(void);
@@ -71,7 +80,7 @@ static void and_d(void);
 static void and_e(void);
 static void and_h(void);
 static void and_l(void);
-//static void and_hla(void);
+//static void and_hl(void);
 static void and_a(void);
 static void and_n(uint8_t operand);
 static void xor_b(void);
@@ -80,7 +89,7 @@ static void xor_d(void);
 static void xor_e(void);
 static void xor_h(void);
 static void xor_l(void);
-//static void xor_hla(void);
+//static void xor_hl(void);
 static void xor_a(void);
 static void xor_n(uint8_t operand);
 static void or_b(void);
@@ -89,7 +98,7 @@ static void or_d(void);
 static void or_e(void);
 static void or_h(void);
 static void or_l(void);
-//static void or_hla(void);
+//static void or_hl(void);
 static void or_a(void);
 static void or_n(uint8_t operand);
 static void cp_b(void);
@@ -100,6 +109,9 @@ static void cp_h(void);
 static void cp_l(void);
 //static void cp_hla(void);
 static void cp_a(void);
+static void ldh_n_a(uint8_t operand);
+static void ldh_a_n(uint8_t operand);
+static void ld_a_nn(uint16_t operand);
 static void cp_n(uint8_t operand);
 
 // B
@@ -199,10 +211,14 @@ static void add_hl_sp(void);
 static void ld_sp_nn(uint16_t operand);
 static void inc_sp(void);
 static void dec_sp(void);
+static void pop_bc(void);
 static void push_bc(void);
+static void pop_de(void);
 static void push_de(void);
+static void pop_hl(void);
 static void push_hl(void);
 static void add_sp(uint8_t val);
+static void pop_af(void);
 static void push_af(void);
 
 // PC
