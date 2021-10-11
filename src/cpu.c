@@ -10,17 +10,16 @@
 #include "registers.h"
 
 #include "cpu.h"
-
 const struct instruction instr[256] =
 {
-    {"nop",	0, nop, 1},											// 0x00
+    {"nop",	0, nop, 1},										// 0x00
     {"LD	BC,0x%04x", 2, ld_bc_nn, 3},		// 0x01 
     {"LD	(BC),A", 0, undefined, 2},			// 0x02
     {"INC	BC", 0, inc_bc, 2},							// 0x03
     {"INC	B", 0, inc_b, 1},								// 0x04
     {"DEC	B", 0, dec_b, 1},								// 0x05
     {"LD	B,0x%02x", 1, ld_b_n, 2},				// 0x06
-    {"RLCA", 0, undefined, 1},							// 0x07
+    {"RLCA", 0, undefined, 1},						// 0x07
     {"LD	(0x%04x),SP", 2, undefined, 5},	// 0x08
     {"ADD	HL,BC", 0, add_hl_bc, 2},				// 0x09
     {"LD	A,(BC)", 0, undefined, 2},			// 0x0A
@@ -28,15 +27,15 @@ const struct instruction instr[256] =
     {"INC	C", 0, inc_c, 1},								// 0x0C
     {"DEC	C", 0, dec_c, 1},								// 0x0D
     {"LD	C,0x%02x", 1, ld_c_n, 2},				// 0x0E
-    {"RRCA", 0, undefined, 1},							// 0x0F
-    {"STOP	0x%02x", 1, undefined, 1},			// 0x10
+    {"RRCA", 0, undefined, 1},						// 0x0F
+    {"STOP	0x%02x", 1, undefined, 1},		// 0x10
     {"LD	DE,0x%04x", 2, ld_de_nn, 3},		// 0x11
     {"LD	(DE),A", 0, undefined, 2},			// 0x12
     {"INC	DE", 0, inc_de, 2},							// 0x13
     {"INC	D", 0, inc_d, 1},								// 0x14
     {"DEC	D", 0, dec_d, 1},								// 0x15
     {"LD	D,0x%02x", 1, ld_d_n, 2},				// 0x16
-    {"RLA", 0, undefined, 1},								// 0X17
+    {"RLA", 0, undefined, 1},							// 0X17
     {"JR	0x%02x", 1, undefined, 3},			// 0x18
     {"ADD	HL,DE", 0, add_hl_de, 2},				// 0x19
     {"LD	A,(DE)", 0, undefined, 2},			// 0x1A
@@ -44,8 +43,8 @@ const struct instruction instr[256] =
     {"INC	E", 0, inc_e, 1},								// 0x1C
     {"DEC	E", 0, dec_e, 1},								// 0x1D
     {"LD	E,0x%02x", 1, ld_e_n, 2},				// 0x1E
-    {"RRA", 0, undefined, 1},								// 0x1F
-    {"STOP", 0, undefined, 2},							// 0x20
+    {"RRA", 0, undefined, 1},							// 0x1F
+    {"STOP", 0, undefined, 2},						// 0x20
     {"LD	HL,0x%04x", 2, ld_hl_nn, 3},		// 0x21 timing is 2 or 3
     {"LD	(HL+),A", 0, undefined, 2},			// 0X22
     {"INC	HL", 0, inc_hl, 2},							// 0x23
@@ -305,6 +304,14 @@ static void undefined(void)
 //  Generalized Instructions
 ////
 
+// push current address onto stack
+// jump to address 0x0000 + n
+// requires: val to add to base
+static void rst(uint8_t val)
+{
+	// push_nn(registers.pc);
+}
+
 // increase values and set flags
 // requires: val to increase
 // returns: increased value
@@ -413,6 +420,10 @@ static void cp(uint8_t val)
 //	CPU Instructions
 ////
 
+////
+//  MISC
+////
+
 // 0x00 NOP
 static void nop(void) {}
 
@@ -436,6 +447,34 @@ static void ccf(void)
 	registers.f &= !(NEG_FLAG + HALF_FLAG);
 	registers.f ^= CARRY_FLAG;
 }
+
+////
+//  Restarts
+////
+
+// 0xC7 RST 00H
+static void rst_00() { rst(0x00); }
+
+// 0xCF RST 08H
+static void rst_08() { rst(0x08); }
+
+// 0xD7 RST 10H
+static void rst_10() { rst(0x10); }
+
+// 0xDF RST 18H
+static void rst_18() { rst(0x18); }
+
+// 0xE7 RST 20H
+static void rst_20() { rst(0x20); }
+
+// 0xEF RST 28H
+static void rst_28() { rst(0x28); }
+
+// 0xF7 RST 30H
+static void rst_30() { rst(0x30); }
+
+// 0xFF RST 38H
+static void rst_38() { rst(0x38); }
 
 ////
 //	A
@@ -913,3 +952,10 @@ static void add_sp(uint8_t val)
 		+ ((registers.sp & 0x0fff)+(val & 0x0fff)>0x0fff)*HALF_FLAG;
 	registers.sp = (uint16_t) result;
 }
+
+////
+//	PC
+////
+
+// 0xC3 JP,nn
+static void jp_nn(uint16_t add) { registers.pc = add; }

@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 
 	registers.pc = ROM_START;
 
-	while (registers.pc < ROM_START + 6) {
+	while (registers.pc < ROM_START + 100) {
 		
 		cpu_step();
 

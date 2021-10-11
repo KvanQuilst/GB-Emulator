@@ -20,11 +20,23 @@ struct instruction
 
 static void undefined(void);
 
+// Misc
 static void nop(void);
 static void cpl(void);
 static void scf(void);
 static void ccf(void);
 
+// Restarts
+static void rst_00(void);
+static void rst_08(void);
+static void rst_10(void);
+static void rst_18(void);
+static void rst_20(void);
+static void rst_28(void);
+static void rst_30(void);
+static void rst_38(void);
+
+// A
 static void inc_a(void);
 static void dec_a(void);
 static void ld_a_n(uint8_t operand);
@@ -90,6 +102,7 @@ static void cp_l(void);
 static void cp_a(void);
 static void cp_n(uint8_t operand);
 
+// B
 static void inc_b(void);
 static void dec_b(void);
 static void ld_b_n(uint8_t operand);
@@ -101,6 +114,7 @@ static void ld_b_l(void);
 //static void ld_b_hla(void);
 static void ld_b_a(void);
 
+// C
 static void inc_c(void);
 static void dec_c(void);
 static void ld_c_n(uint8_t operand);
@@ -112,10 +126,12 @@ static void ld_c_l(void);
 //static void ld_c_hla(void);
 static void ld_c_a(void);
 
+// BC
 static void ld_bc_nn(uint16_t operand);
 static void inc_bc(void);
 static void dec_bc(void);
 
+// D
 static void inc_d(void);
 static void dec_d(void);
 static void ld_d_n(uint8_t operand);
@@ -127,6 +143,7 @@ static void ld_d_l(void);
 //static void ld_d_hla(void);
 static void ld_d_a(void);
 
+// E
 static void inc_e(void);
 static void dec_e(void);
 static void ld_e_n(uint8_t operand);
@@ -138,10 +155,12 @@ static void ld_e_l(void);
 //static void ld_e_hla(void);
 static void ld_e_a(void);
 
+// DE
 static void ld_de_nn(uint16_t operand);
 static void inc_de(void);
 static void dec_de(void);
 
+// H
 static void inc_h(void);
 static void dec_h(void);
 static void ld_h_n(uint8_t operand);
@@ -153,6 +172,7 @@ static void ld_h_l(void);
 //static void ld_h_hla(void);
 static void ld_h_a(void);
 
+// L
 static void inc_l(void);
 static void dec_l(void);
 static void ld_l_n(uint8_t operand);
@@ -164,6 +184,7 @@ static void ld_l_h(void);
 //static void ld_l_hla(void);
 static void ld_l_a(void);
 
+// HL
 static void add_hl_bc(void);
 static void add_hl_de(void);
 static void ld_hl_nn(uint16_t operand);
@@ -174,7 +195,11 @@ static void dec_hl(void);
 static void add_hl_sp(void);
 //static void ldd_hl_a(void);
 
+// SP
 static void ld_sp_nn(uint16_t operand);
 static void inc_sp(void);
 static void dec_sp(void);
 static void add_sp(uint8_t val);
+
+// PC
+static void jp_nn(uint16_t add);
