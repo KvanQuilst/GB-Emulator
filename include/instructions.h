@@ -199,7 +199,11 @@ static void add_hl_sp(void);
 static void ld_sp_nn(uint16_t operand);
 static void inc_sp(void);
 static void dec_sp(void);
+static void push_bc(void);
+static void push_de(void);
+static void push_hl(void);
 static void add_sp(uint8_t val);
+static void push_af(void);
 
 // PC
 static void jp_nn(uint16_t add);

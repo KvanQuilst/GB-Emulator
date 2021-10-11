@@ -207,11 +207,11 @@ const struct instruction instr[256] =
     {"RET	NZ", 0, undefined, 5},					// 0xC0 timing 2 or 5
     {"POP	BC", 0, undefined, 3},					// 0xC1
     {"JP	NZ,0x%04x", 2, undefined, 4},		// 0xC2 timing 3 or 4
-    {"JP	0x%04x", 2, undefined, 3},			// 0xC3
+    {"JP	0x%04x", 2, jp_nn, 3},					// 0xC3
     {"CALL	NZ,0x%04x", 2, undefined, 6},	// 0xC4 timing 3 or 6
-    {"PUSH	BC", 0, undefined, 4},				// 0xC5
+    {"PUSH	BC", 0, push_bc, 4},					// 0xC5
     {"ADD	A,0x%02x", 1, add_n, 2},				// 0xC6
-    {"RST	00H", 0, undefined, 4},					// 0xC7
+    {"RST	00H", 0, rst_00, 4},						// 0xC7
     {"RET	Z", 0, undefined, 5},						// 0xC8 timing 2 or 5
     {"RET", 0, undefined, 4},							// 0xC9
     {"JP	Z,0x%04x", 2, undefined, 4},		// 0xCA timing 3 or 4
@@ -219,15 +219,15 @@ const struct instruction instr[256] =
     {"CALL	Z,0x%04x", 2, undefined, 6},	// 0xCC timing 3 or 6
     {"CALL	0x%04x", 2, undefined, 6},		// 0xCD
     {"ADC	A,0x%02x", 1, undefined, 2},		// 0xCE
-    {"RST	08H", 0, undefined, 4},					// 0xCF
+    {"RST	08H", 0, rst_08, 4},						// 0xCF
     {"RET	NC", 0, undefined, 5},					// 0xD0 timing 2 or 5
     {"POP	DE", 0, undefined, 3},					// 0xD1
     {"JP	NC,0x%04x", 2, undefined, 4},		// 0xD2 timing 3 or 4
     {"undefined", 0, undefined, 0},				// 0xD3
     {"CALL	NC,0x%04x", 2, undefined, 6},	// 0xD4 timing 3 or 6
-    {"PUSH	DE", 0, undefined, 4},				// 0xD5
+    {"PUSH	DE", 0, push_de, 4},					// 0xD5
     {"SUB	0x%02x", 1, sub_n, 2},					// 0xD6
-    {"RST	10H", 0, undefined, 4},					// 0xD7
+    {"RST	10H", 0, rst_10, 4},						// 0xD7
     {"RET	C", 0, undefined, 5},						// 0xD8	timing 2 or 5
     {"RETI", 0, undefined, 4},						// 0xD9
     {"JP	C,0x%04x", 2, undefined, 4},		// 0xDA timing 3 or 4
@@ -235,15 +235,15 @@ const struct instruction instr[256] =
     {"CALL	C,0x%04x", 2, undefined, 6},	// 0xDC timing 3 or 6
     {"undefined", 0, undefined, 0},				// 0xDD
     {"SBC	A,0x%02x", 1, undefined, 2},		// 0xDE
-    {"RST	18H", 0, undefined, 4},					// 0xDF
+    {"RST	18H", 0, rst_18, 4},						// 0xDF
     {"LDH	(0x%02x),A", 1, undefined, 3},	// 0xE0
     {"POP	HL", 0, undefined, 3},					// 0xE1
     {"LD	(C),A", 0, undefined, 2},				// 0xE2
     {"undefined", 0, undefined, 0},				// 0xE3
     {"undefined", 0, undefined, 0},				// 0xE4
-    {"PUSH	HL", 0, undefined, 4},				// 0xE5
+    {"PUSH	HL", 0, push_hl, 4},					// 0xE5
     {"AND	0x%02x", 1, and_n, 2},					// 0xE6
-    {"RST	20H", 0, undefined, 4},					// 0xE7
+    {"RST	20H", 0, rst_20, 4},						// 0xE7
     {"ADD	SP,0x%02x", 1, add_sp, 4},			// 0xE8
     {"JP	HL", 0, undefined, 1},					// 0xE9
     {"LD	(0x%04x),A", 2, undefined, 3},	// 0xEA
@@ -251,15 +251,15 @@ const struct instruction instr[256] =
     {"undefined", 0, undefined, 0},				// 0xEC
     {"undefined", 0, undefined, 0},				// 0xED
     {"XOR	0x%02x", 1, xor_n, 2},					// 0xEE
-    {"RST	28H", 0, undefined, 2},					// 0xEF
+    {"RST	28H", 0, rst_28, 2},						// 0xEF
     {"LDH	A,(0x%02x)", 1, undefined, 2},	// 0xF0
     {"POP	AF", 0, undefined, 3},					// 0xF1
     {"LD	A,(C)", 0, undefined, 2},				// 0xF2
     {"DI", 0, undefined, 1},							// 0xF3
     {"undefined", 0, undefined, 0},				// 0xF4
-    {"PUSH	AF", 0, undefined, 4},				// 0xF5
+    {"PUSH	AF", 0, push_af, 4},					// 0xF5
     {"OR	0x%02x", 1, or_n, 2},						// 0xF6
-    {"RST	30H", 0, undefined, 4},					// 0xF7
+    {"RST	30H", 0, rst_30, 4},						// 0xF7
     {"LD	HL,SP+0x%02x", 1, undefined, 3},// 0xF8
     {"LD	HL,SP", 0, undefined, 2},				// 0xF9
     {"LD	A,(0x%04x)", 2, undefined, 4},	// 0xFA
@@ -267,7 +267,7 @@ const struct instruction instr[256] =
     {"undefined", 0, undefined, 0},				// 0xFC
     {"undefined", 0, undefined, 0},				// 0xFD
     {"CP	0x%02x", 1, cp_n, 2},						// 0xFE
-    {"RST	38H", 0, undefined, 4}					// 0xFF
+    {"RST	38H", 0, rst_38, 4}							// 0xFF
 };
 
 uint8_t cpu_step(void)
@@ -943,6 +943,27 @@ static void inc_sp(void) { registers.sp++; }
 // 0x3B DEC SP
 static void dec_sp(void) { registers.sp--; }
 
+// 0xC5 PUSH BC
+static void push_bc(void) 
+{
+	write_stack(registers.bc);
+	registers.sp -= 2;
+}
+
+// 0xD5 PUSH DE
+static void push_de(void) 
+{
+	write_stack(registers.de);
+	registers.sp -= 2;
+}
+
+// 0xE5 PUSH HL
+static void push_hl(void) 
+{
+	write_stack(registers.hl);
+	registers.sp -= 2;
+}
+
 // 0xE8 ADD SP,n
 static void add_sp(uint8_t val)
 {
@@ -951,6 +972,13 @@ static void add_sp(uint8_t val)
 	registers.f |= (result & 0xffff0000) * CARRY_FLAG
 		+ ((registers.sp & 0x0fff)+(val & 0x0fff)>0x0fff)*HALF_FLAG;
 	registers.sp = (uint16_t) result;
+}
+
+// 0xF5 PUSH AF
+static void push_af(void) 
+{
+	write_stack(registers.af);
+	registers.sp -= 2;
 }
 
 ////

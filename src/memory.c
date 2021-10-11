@@ -51,30 +51,35 @@ uint16_t read_double(uint16_t address)
 	//printf("read_double\n");
 	if (address >= HRAM) {
 		dbl = ((uint16_t) hram[address-HRAM])<<0x08;
-		dbl += (uint16_t) hram[address-HRAM+0x08];
+		dbl += (uint16_t) hram[address-HRAM+1];
 	} else if (address >= IO) {
 		dbl = ((uint16_t) io[address-IO])<<0x08;
-		dbl += (uint16_t) io[address-IO+0x08];
+		dbl += (uint16_t) io[address-IO+1];
 	} else if (address >= OAM) {
 		dbl = ((uint16_t) oam[address-OAM])<<0x08;
-		dbl += (uint16_t) oam[address-OAM];
+		dbl += (uint16_t) oam[address-OAM+1];
 	} else if (address >= LRAM) {
 		dbl = ((uint16_t) lram[address-LRAM])<<0x08;
-		dbl += (uint16_t) lram[address-LRAM+0x08];
+		dbl += (uint16_t) lram[address-LRAM+1];
 	} else if (address >= SRAM) {
 		dbl = ((uint16_t) sram[address-SRAM])<<0x08;
-		dbl += (uint16_t) sram[address-SRAM+0x08];
+		dbl += (uint16_t) sram[address-SRAM+1];
 	} else if (address >= VRAM) {
 		dbl = ((uint16_t) vram[address-VRAM])<<0x08;
-		dbl += (uint16_t) vram[address-VRAM+0x08];
+		dbl += (uint16_t) vram[address-VRAM+1];
 	} else if (address >= CART) {
 		dbl = ((uint16_t) cart[address])<<0x08;
-		dbl += (uint16_t) cart[address];
+		dbl += (uint16_t) cart[address+1];
 	} else {
 		fprintf(stderr, "read_byte: invalid address\n");
 		exit(1);
 	}
 	return dbl;
+}
+
+uint16_t read_stack(void)
+{
+	return read_double(registers.sp);
 }
 
 void write_byte(uint16_t address, uint8_t byte)
@@ -100,29 +105,34 @@ void write_byte(uint16_t address, uint8_t byte)
 
 void write_double(uint16_t address, uint16_t dbl)
 {
-	uint8_t ls = 0x00FF | dbl;
-	uint8_t ms = 0xFF00 | dbl;
+	uint8_t ls = (uint8_t) 0x00FF & dbl;
+	uint8_t ms = (uint8_t) (0xFF00 & dbl)>>8;
 	//printf("write_double\n");
 	if (address >= HRAM) {
 		hram[address-HRAM] = ls;
-		hram[address-HRAM+0x08] = ms;
+		hram[address-HRAM+1] = ms;
 	} else if (address >= IO) {
 		io[address-IO] = ls;
-		io[address-IO+0x08] = ms;
+		io[address-IO+1] = ms;
 	} else if (address >= OAM) {
 		oam[address-OAM] = ls;
-		oam[address-OAM+0x08] = ms;
+		oam[address-OAM+1] = ms;
 	} else if (address >= LRAM) {
 		lram[address-LRAM] = ls;
-		lram[address-LRAM+0x08] = ms;
+		lram[address-LRAM+1] = ms;
 	} else if (address >= SRAM) {
 		sram[address-SRAM] = ls;
-		sram[address-SRAM+0x08] = ms;
+		sram[address-SRAM+1] = ms;
 	} else if (address >= VRAM) {
 		vram[address-VRAM] = ls;
-		vram[address-VRAM+0x08] = ms;
+		vram[address-VRAM+1] = ms;
 	} else {
 		fprintf(stderr, "write_byte: invalid address\n");
 		exit(1);
 	}
+}
+
+void write_stack(uint16_t dbl)
+{
+	write_double(registers.sp, dbl);
 }
