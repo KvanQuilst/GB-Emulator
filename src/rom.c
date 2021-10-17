@@ -128,7 +128,8 @@ uint8_t loadROM(char* filename)
 			return -1;
 		}				
 	}
-	printf("cart write success!\n");
+	printf("cart write success!\n\n");
+	printf("------------------------------------------------\n\n");
 
 	fclose(rom);
 	return 0;

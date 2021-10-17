@@ -6,7 +6,6 @@
  */
 
 #include <SDL2/SDL.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,16 +13,17 @@
 #include <unistd.h>
 
 #include "cpu.h"
+#include "global.h"
 #include "registers.h"
 #include "rom.h"
-
 ///////////////
 //
 // GLOBAL VARS
 //
 ///////////////
 
-int debug = 0;		// debug flag --> show instruction and register info
+bool debug = false;	// debug flag
+bool printregs = false; // print regsiters table
 
 ///////////////
 //
@@ -35,7 +35,11 @@ int debug = 0;		// debug flag --> show instruction and register info
 // automatically exits program with exit code 1
 void usage(char *msg)
 {
-	fprintf(stderr, "%s: [-d] filename\n", msg);
+	fprintf(stderr, "%s: <flags> filename\n", msg);
+	fprintf(stderr, "  -d: enable debug\n");
+	fprintf(stderr, "  -t: term only\n");
+	fprintf(stderr, "  -r: print register table\n");
+	fprintf(stderr, "  -h: show this message\n");
 	exit(1);
 }
 
@@ -52,19 +56,32 @@ int main(int argc, char **argv)
 {
 	SDL_Window *window;	// program window
 	SDL_Event e;							// tracks events from window
-	bool running;							// is emulator running?
+	bool running = true;	  	// is emulator running?
+	bool nowin = false;				// toggle window
 	char *filename;						// filename provided from user
 	char ch;									// char for options
 	int argnum = 1;
+	
+///////////////////////////////////////////////////////////
+//
+// Initlize and Arguments
+//
+///////////////////////////////////////////////////////////
 
 	// arg checking
-	while ((ch = getopt(argc, argv, "dh:")) != -1) {
+	while ((ch = getopt(argc, argv, "dtrh:")) != -1) {
 		argnum++;
 		switch (ch) {
 			case 'd': /* debug */
-				debug = 1;
+				debug = true;
 				break;
-			case 'h':
+			case 't':	/* term only */
+				nowin = true;
+				break;
+			case 'r': /* print regs */
+				printregs = true;
+				break;
+			case 'h': /* help */
 				usage(argv[0]);
 				break;
 		}
@@ -79,38 +96,74 @@ int main(int argc, char **argv)
 	}
 	filename = argv[argnum];
 
+/////////////////////////////////////////////////////////
+//
+// Rom Prep and Loading
+//
+/////////////////////////////////////////////////////////
+
+	initRegs();
+
 	// load rom
+	printf("-----------------------------------------------\n\n");
 	printf("loading file...\n\n");
 	if (loadROM(filename) == -1) p_error("error loading file");
 
 	registers.pc = ROM_START;
 
-	while (registers.pc < ROM_START + 100) {
+	// print legend for registers
+	if (printregs) {
+		printf("Instr\t\t\t| rF\trA\trB\trC\trD\trE\trH\trL\trSP\trPC\n");
+	}
+
+///////////////////////////////////////////////////////////
+//
+// Program Loop
+//
+///////////////////////////////////////////////////////////
+
+	while (true) {
 		
 		cpu_step();
-
 	}
 
-	window = init_screen();
+	if (!nowin) {
+		window = init_screen();
 
-	SDL_UpdateWindowSurface(window);
-
-	// main loop
-	while(running) {
-
-		// event loop
-		while (SDL_PollEvent(&e) > 0) {
-			switch(e.type) {
-				case SDL_QUIT:
-					running = false;
-					break;
-			}
-		}
 		SDL_UpdateWindowSurface(window);
-	}
 
+		// main loop
+		while(running) {
+
+			// event loop
+			while (SDL_PollEvent(&e) > 0) {
+				switch(e.type) {
+					case SDL_QUIT:
+						running = false;
+						break;
+
+					case SDL_KEYDOWN:
+						uint8_t const *keys = SDL_GetKeyboardState(NULL);
+
+						// exit program
+						if (keys[SDL_SCANCODE_ESCAPE]) running = false;
+
+						break;
+				}
+			}
+			SDL_UpdateWindowSurface(window);
+		}
+		SDL_Quit();
+	}
+	
 	return 0;
 }
+
+/////////////////////////////////////////////////////////
+//
+// Screen Functions
+//
+/////////////////////////////////////////////////////////
 
 // initialize screen
 SDL_Window *init_screen(void)

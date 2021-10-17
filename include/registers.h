@@ -27,6 +27,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stdio.h>
 
 #define ZERO_FLAG   0x80
 #define NEG_FLAG    0x40
@@ -74,3 +75,9 @@ struct registers {
     uint16_t sp;
     uint16_t pc;
 } extern registers;
+
+// initialize the registers to their respective values
+void initRegs(void);
+
+// print the current state of the registres
+void printRegs(void);
