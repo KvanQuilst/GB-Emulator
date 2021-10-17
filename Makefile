@@ -7,7 +7,7 @@ CFILES	:= $(wildcard $(SDIR)/*.c)
 OBJS		:= $(patsubst $(SDIR)/%.c, $(ODIR)/%.o, $(CFILES))
 CC			:= gcc
 CFLAGS	:= -g -Wall -iquote $(IDIR)
-LFLAGS	:=
+LFLAGS	:= `sdl2-config --cflags --libs`
 
 gbemu: $(ODIR) $(OBJS)
 	$(CC) $(ODIR)/*.o -o $@ $(LFLAGS)
