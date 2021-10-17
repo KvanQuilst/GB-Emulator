@@ -23,7 +23,6 @@
 ///////////////
 
 bool debug = false;	// debug flag
-bool printregs = false; // print regsiters table
 
 ///////////////
 //
@@ -69,7 +68,7 @@ int main(int argc, char **argv)
 ///////////////////////////////////////////////////////////
 
 	// arg checking
-	while ((ch = getopt(argc, argv, "dtrh:")) != -1) {
+	while ((ch = getopt(argc, argv, "dth:")) != -1) {
 		argnum++;
 		switch (ch) {
 			case 'd': /* debug */
@@ -78,17 +77,11 @@ int main(int argc, char **argv)
 			case 't':	/* term only */
 				nowin = true;
 				break;
-			case 'r': /* print regs */
-				printregs = true;
-				break;
 			case 'h': /* help */
 				usage(argv[0]);
 				break;
 		}
 	}
-
-	// debug check
-	if (debug) printf("debug enabled\n");
 
 	// check for filename and set filename
 	if (argnum >= argc) {
@@ -105,16 +98,20 @@ int main(int argc, char **argv)
 	initRegs();
 
 	// load rom
-	printf("-----------------------------------------------\n\n");
-	printf("loading file...\n\n");
+	if (debug) {
+		printf("-----------------------------------------------\n\n");
+		printf("loading file...\n\n");
+	}
+
 	if (loadROM(filename) == -1) p_error("error loading file");
 
 	registers.pc = ROM_START;
 
-	// print legend for registers
-	if (printregs) {
-		printf("Instr\t\t\t| rF\trA\trB\trC\trD\trE\trH\trL\trSP\trPC\n");
-	}
+	// print legend for debug info
+	if (debug) 
+		printf("Instr\t\t\tOP\trF\trA\trB\trC\trD\trE\trH\trL\trSP\trPC\n");
+	else printf("\n");
+	
 
 ///////////////////////////////////////////////////////////
 //

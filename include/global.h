@@ -7,4 +7,3 @@
 #include <stdbool.h>
 
 extern bool debug;
-extern bool printregs;

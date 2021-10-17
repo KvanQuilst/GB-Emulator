@@ -28,7 +28,7 @@ void printRegs(void)
 	if (registers.f & 0x10) flags[3] = 'C';
 
 	/*						rF	rA  rB	rC	rD	rE	rH	rL	rSP	 rPC*/
-	printf("\t| %s\t0x%02x\t0x%02x\t0x%02x\t0x%02x\t0x%02x\t",
+	printf(" %s\t0x%02x\t0x%02x\t0x%02x\t0x%02x\t0x%02x\t",
 			flags,
 			registers.a,
 			registers.b,

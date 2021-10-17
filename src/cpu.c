@@ -17,14 +17,27 @@ uint8_t cpu_step(void)
 	uint8_t instruction = read_byte(registers.pc);
 	uint16_t operand;
 
-	printf("0x%04x: %s", registers.pc, instr[instruction].disas);	
-	if (printregs) printRegs();
-	else printf("\n");
+	if (debug)
+		printf("0x%04x: %s", registers.pc, instr[instruction].disas);	
+
 	// set operands if any
 	registers.pc++;
-	if (instr[instruction].ops == 1) operand = (uint16_t)read_byte(registers.pc);
-	if (instr[instruction].ops == 2) operand = read_double(registers.pc);
+	if (instr[instruction].ops == 1) {
+		operand = (uint16_t)read_byte(registers.pc);
+
+		if (debug) printf("\t0x%02x\t", (uint8_t)operand);
+
+	} else if (instr[instruction].ops == 2) {
+		operand = read_double(registers.pc);
+
+		if (debug) printf("\t0x%04x\t", operand);
+
+	} else if (debug) {
+		printf("\t\t");
+	}
 	registers.pc += instr[instruction].ops;
+
+	if (debug) printRegs();
 
 	// execute instruction
 	switch (instr[instruction].ops) {
@@ -48,7 +61,7 @@ uint8_t cpu_step(void)
 // for any instructions that are not defined
 static void undefined(void)
 {
-    printf("^ this instruction is undefined\n");
+    if (debug) printf("^ this instruction is undefined\n");
 		exit(1);
 }
 
