@@ -19,13 +19,17 @@ void initRegs(void)
 	registers.pc = 0x0100;
 }
 
-void printRegs(void)
+void printRegs(uint16_t operand, int bytes)
 {
 	char flags[4] = "----";
 	if (registers.f & 0x80) flags[0] = 'Z';
 	if (registers.f & 0x40) flags[1] = 'N';
 	if (registers.f & 0x20) flags[2] = 'H';
 	if (registers.f & 0x10) flags[3] = 'C';
+
+	if (bytes == 1) printf("\t0x%02x\t", (uint8_t)operand);
+	else if (bytes == 2) printf("\t0x%04x\t", operand);
+	else printf("\t\t");
 
 	/*						rF	rA  rB	rC	rD	rE	rH	rL	rSP	 rPC*/
 	printf(" %s\t0x%02x\t0x%02x\t0x%02x\t0x%02x\t0x%02x\t",

@@ -215,12 +215,14 @@ static void pop_de(void);
 static void push_de(void);
 static void pop_hl(void);
 static void push_hl(void);
-static void add_sp(uint8_t val);
+static void add_sp(uint8_t operand);
 static void pop_af(void);
 static void push_af(void);
 
 // PC
-static void jp_nn(uint16_t add);
+static void jr(uint8_t operand);
+static void jr_z(uint8_t operand);
+static void jp_nn(uint16_t operand);
 
 ////
 //	Instructions array
@@ -252,7 +254,7 @@ const struct instruction instr[256] =
     {"DEC	D", 0, dec_d, 1},								// 0x15
     {"LD	D,n", 1, ld_d_n, 2},						// 0x16
     {"RLA", 0, undefined, 1},							// 0X17
-    {"JR	n", 1, undefined, 3},						// 0x18
+    {"JR	n", 1, jr, 3},									// 0x18
     {"ADD	HL,DE", 0, add_hl_de, 2},				// 0x19
     {"LD	A,(DE)", 0, undefined, 2},			// 0x1A
     {"DEC	DE", 0, dec_de, 2},							// 0x1B
@@ -268,7 +270,7 @@ const struct instruction instr[256] =
     {"DEC	H", 0, dec_h, 1},								// 0x25
     {"LD	H,n", 1, ld_h_n, 2},						// 0x26
     {"DAA", 0, undefined, 1},							// 0x27
-    {"JR	Z,n", 1, undefined, 3},					// 0x28 timing is 2 or 3
+    {"JR	Z,n", 1, jr_z, 3},							// 0x28 timing is 2 or 3
     {"ADD	HL,HL", 0, add_hl_hl, 2},				// 0x29
     {"LD	A,(HL+)", 0, undefined, 2},			// 0x2A
     {"DEC	HL", 0, dec_hl, 2},							// 0x2B

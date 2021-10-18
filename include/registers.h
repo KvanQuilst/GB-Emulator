@@ -79,5 +79,7 @@ struct registers {
 // initialize the registers to their respective values
 void initRegs(void);
 
-// print the current state of the registres
-void printRegs(void);
+// print the current state of the registers
+// and the operand of the instruction
+// requires: operand value, 0|1|2 bytes
+void printRegs(uint16_t operands, int bytes);

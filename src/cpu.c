@@ -20,40 +20,35 @@ uint8_t cpu_step(void)
 	if (debug)
 		printf("0x%04x: %s", registers.pc, instr[instruction].disas);	
 
-	// set operands if any
 	registers.pc++;
-	if (instr[instruction].ops == 1) {
-		operand = (uint16_t)read_byte(registers.pc);
-
-		if (debug) printf("\t0x%02x\t", (uint8_t)operand);
-
-	} else if (instr[instruction].ops == 2) {
-		operand = read_double(registers.pc);
-
-		if (debug) printf("\t0x%04x\t", operand);
-
-	} else if (debug) {
-		printf("\t\t");
-	}
-	registers.pc += instr[instruction].ops;
-
-	if (debug) printRegs();
-
-	// execute instruction
+	// set ops and execute instruction
 	switch (instr[instruction].ops) {
 
+		// no operands
 		case 0:
+			if (debug) printRegs(0, 0);
 			((void (*)(void))instr[instruction].exec)();
 			break;
 		
+		// 1 byte operand
 		case 1:
+			operand = (uint16_t)read_byte(registers.pc);
+			registers.pc++;
+			if (debug) printRegs(operand, 1);
+
 			((void (*)(uint8_t))instr[instruction].exec)((uint8_t)operand);
 			break;
 
+		// 2 byte operand
 		case 2:
+			operand = read_double(registers.pc);
+			registers.pc+=2;
+			if (debug) printRegs(operand, 2);
+
 			((void (*)(uint16_t))instr[instruction].exec)(operand);
 			break;
 	}
+
 	// ticks += instr[instruction].ticks;
 	return 1;
 }
@@ -814,12 +809,12 @@ static void push_hl(void)
 }
 
 // 0xE8 ADD SP,n
-static void add_sp(uint8_t val)
+static void add_sp(uint8_t operand)
 {
-	uint32_t result = registers.sp + val;
+	uint32_t result = registers.sp + operand;
 	registers.f &= !(ALL_FLAGS);
 	registers.f |= (result & 0xffff0000) * CARRY_FLAG
-		+ ((registers.sp & 0x0fff)+(val & 0x0fff)>0x0fff)*HALF_FLAG;
+		+ ((registers.sp & 0x0fff)+(operand & 0x0fff)>0x0fff)*HALF_FLAG;
 	registers.sp = (uint16_t) result;
 }
 
@@ -841,5 +836,15 @@ static void push_af(void)
 //	PC
 ////
 
+// 0x18 JR n (signed)
+static void jr(uint8_t operand)
+{
+	registers.pc += ((operand>>7) * operand & 0x7F)
+							 + (!(operand>>7) * operand & 0x7F);
+}
+
+// 0x28 JR Z,n (signed)
+static void jr_z(uint8_t operand) { if (registers.f >> 7) jr(operand); }
+
 // 0xC3 JP,nn
-static void jp_nn(uint16_t add) { registers.pc = add; }
+static void jp_nn(uint16_t operand) { registers.pc = operand; }
