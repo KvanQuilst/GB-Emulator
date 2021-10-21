@@ -121,7 +121,7 @@ uint8_t loadROM(char* filename)
 	size_t tmp = 0;
 	while (tmp < length) {
 		errno = 0;
-		tmp += fread(cart, 1, length-tmp, rom);
+		tmp += fread(memory.cart, 1, length-tmp, rom);
 		if (errno != 0) {
 			perror("fread");
 			fclose(rom);

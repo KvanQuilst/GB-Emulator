@@ -6,8 +6,7 @@
 
 #pragma once
 
-// struct containing important information regarding 
-// the processor instructions for GameBoy
+// struct containing important information regarding // the processor instructions for GameBoy
 struct instruction 
 {
     char *disas;        // instruction disassembly
@@ -198,7 +197,7 @@ static void ld_l_a(void);
 static void add_hl_bc(void);
 static void add_hl_de(void);
 static void ld_hl_nn(uint16_t operand);
-//static void ldi_hl_a(void);
+static void ldi_hl_a(void);
 static void inc_hl(void);
 static void add_hl_hl(void);
 static void dec_hl(void);
@@ -264,7 +263,7 @@ const struct instruction instr[256] =
     {"RRA", 0, undefined, 1},							// 0x1F
     {"STOP", 0, undefined, 2},						// 0x20
     {"LD	HL,nn", 2, ld_hl_nn, 3},				// 0x21 timing is 2 or 3
-    {"LD	(HL+),A", 0, undefined, 2},			// 0X22
+    {"LD	(HL+),A", 0, ldi_hl_a, 2},			// 0X22
     {"INC	HL", 0, inc_hl, 2},							// 0x23
     {"INC	H", 0, inc_h, 1},								// 0x24
     {"DEC	H", 0, dec_h, 1},								// 0x25

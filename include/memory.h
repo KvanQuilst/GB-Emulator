@@ -13,13 +13,24 @@
 #include "registers.h"
 #include "rom.h"
 
-extern uint8_t cart[0x8000];	// 32kB size ROM
-extern uint8_t vram[0x2000];
-extern uint8_t sram[0x2000];	// switchable ram bank
-extern uint8_t lram[0x2000];	// low internal ram
-extern uint8_t oam[0xA0];		// sprites
-extern uint8_t io[0x4C];
-extern uint8_t hram[0x7F];		// high internal ram
+struct memory {
+	union {
+		struct {
+			uint8_t cart[0x8000];	// 32kB size ROM
+			uint8_t vram[0x2000]; // video ram
+			uint8_t sram[0x2000];	// switchable ram bank
+			uint8_t lram[0x2000];	// low internal ram
+			uint8_t elram[0x2000];// echo of low internal ram
+			uint8_t oam[0xA0];		// sprites
+			uint8_t blankl[0x60]; // blank mem below i/o
+			uint8_t io[0x4C];			// input/output storage
+			uint8_t blankh[0xBC];	// blank mem above i/o
+			uint8_t hram[0x7F];		// high internal ram
+		};
+		uint8_t full[0xFFFF];
+	};
+} extern memory;
+
 
 // read a byte from the memory address space
 // requires: an address for reading from

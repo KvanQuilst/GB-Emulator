@@ -735,6 +735,9 @@ static void add_hl_de(void) { add_hl(registers.de); }
 static void ld_hl_nn(uint16_t operand) { registers.hl = operand; }
 
 // 0x22 LD (HL+),A
+static void ldi_hl_a(void) { write_byte(registers.hl++, registers.a); }
+
+// 0x22 LD (HL+),A
 //static void ldi_hl_a(void) { }
 
 // 0x23 INC HL
