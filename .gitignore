@@ -1,0 +1,11 @@
+#ignored directories
+/obs
+/games
+/testing
+
+# ignored file types
+*.o
+
+# specific ignore
+gbemu
+
