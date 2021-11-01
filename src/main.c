@@ -14,8 +14,10 @@
 
 #include "cpu.h"
 #include "global.h"
+#include "gpu.h"
 #include "registers.h"
 #include "rom.h"
+
 ///////////////
 //
 // GLOBAL VARS
@@ -35,10 +37,9 @@ bool debug = false;	// debug flag
 void usage(char *msg)
 {
 	fprintf(stderr, "%s: <flags> filename\n", msg);
-	fprintf(stderr, "  -d: enable debug\n");
-	fprintf(stderr, "  -t: term only\n");
-	fprintf(stderr, "  -r: print register table\n");
-	fprintf(stderr, "  -h: show this message\n");
+	fprintf(stderr, "\t-d: enable debug\n");
+	fprintf(stderr, "\t-t: term only\n");
+	fprintf(stderr, "\t-h: show this message\n");
 	exit(1);
 }
 
@@ -118,6 +119,8 @@ int main(int argc, char **argv)
 // Program Loop
 //
 ///////////////////////////////////////////////////////////
+
+//	gpu_init();
 
 	while (true) {
 		

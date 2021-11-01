@@ -6,18 +6,7 @@
 
 #include "memory.h"
 
-// Memory boundaries
-#define CART 0x0000
-#define VRAM 0x8000
-#define SRAM 0xA000
-#define LRAM 0xC000
-#define OAM  0xFE00
-#define IO	 0xFF00
-#define HRAM 0xFF80
-
-// Register and device locations
-
-struct memory memory;
+uint8_t mem[0xFFFF];
 
 uint8_t read_byte(uint16_t address)
 {
@@ -25,7 +14,7 @@ uint8_t read_byte(uint16_t address)
 		fprintf(stderr, "read_byte: invalid address\n");
 		exit(1);
 	}
-	return memory.full[address];
+	return mem[address];
 }
 
 uint16_t read_double(uint16_t address)
@@ -35,8 +24,8 @@ uint16_t read_double(uint16_t address)
 		fprintf(stderr, "read_byte: invalid address\n");
 		exit(1);
 	}
-	dbl = ((uint16_t) memory.full[address])<<0x08;
-	dbl += (uint16_t) memory.full[address+1];
+	dbl = ((uint16_t) mem[address])<<0x08;
+	dbl += (uint16_t) mem[address+1];
 	return dbl;
 }
 
@@ -53,7 +42,7 @@ void write_byte(uint16_t address, uint8_t byte)
 		fprintf(stderr, "write_byte: invalid address\n");
 		exit(1);
 	}
-	memory.full[address] = byte;
+	mem[address] = byte;
 }
 
 void write_double(uint16_t address, uint16_t dbl)
@@ -66,8 +55,8 @@ void write_double(uint16_t address, uint16_t dbl)
 		fprintf(stderr, "write_byte: invalid address\n");
 		exit(1);
 	}
-	memory.full[address] = ls;
-	memory.full[address+1] = ms;
+	mem[address] = ls;
+	mem[address+1] = ms;
 }
 
 void write_stack(uint16_t dbl)
