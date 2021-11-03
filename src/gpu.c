@@ -13,6 +13,7 @@
 //	Globals
 ////
 SDL_Window *window;
+SDL_Surface *surface;
 SDL_Event e;
 bool running;
 
@@ -28,9 +29,17 @@ void g_error(const char *msg)
 }
 
 // process any frame rendering
-void gpu_step ()
+void gpu_step (void)
 {
+	while (SDL_PollEvent(&e) > 0) {
+		switch(e.type) {
+			case SDL_QUIT:
+				running = false;
+				break;
+		}
+	}
 
+	SDL_UpdateWindowSurface(window);
 }
 
 ///////////////////
@@ -40,13 +49,14 @@ void gpu_step ()
 ///////////////////
 
 // initialize the screen
-void gpu_init ()
+void gpu_init (void)
 {
-	SDL_Surface *surface;
+	printf("initializing gpu rendering...\n\n");
 
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
 		g_error(SDL_GetError());
 	}
+	atexit(SDL_Quit);
 
 	window = SDL_CreateWindow("gbemu",
 														SDL_WINDOWPOS_CENTERED,

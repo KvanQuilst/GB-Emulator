@@ -7,5 +7,8 @@
 
 #include <stdbool.h>
 
-void gpu_init ();
-void gpu_step ();
+extern bool running;
+
+void gpu_init(void);
+void gpu_exit(void);
+void gpu_step(void);

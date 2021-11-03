@@ -50,12 +50,8 @@ void p_error(char *msg)
 	exit(1);
 }
 
-SDL_Window *init_screen(void);
-
 int main(int argc, char **argv)
 {
-	SDL_Window *window;	// program window
-	SDL_Event e;							// tracks events from window
 	bool running = true;	  	// is emulator running?
 	bool nowin = false;				// toggle window
 	char *filename;						// filename provided from user
@@ -108,6 +104,8 @@ int main(int argc, char **argv)
 
 	registers.pc = ROM_START;
 
+	if (!nowin) gpu_init();
+
 	// print legend for debug info
 	if (debug) 
 		printf("Instr\t\t\tOP\trF\trA\trB\trC\trD\trE\trH\trL\trSP\trPC\n");
@@ -120,91 +118,10 @@ int main(int argc, char **argv)
 //
 ///////////////////////////////////////////////////////////
 
-//	gpu_init();
-
-	while (true) {
-		
+	while (running) {
 		cpu_step();
+		if (!nowin) gpu_step();
 	}
 
-	if (!nowin) {
-		window = init_screen();
-
-		SDL_UpdateWindowSurface(window);
-
-		// main loop
-		while(running) {
-
-			// event loop
-			while (SDL_PollEvent(&e) > 0) {
-				switch(e.type) {
-					case SDL_QUIT:
-						running = false;
-						break;
-
-					case SDL_KEYDOWN:
-						uint8_t const *keys = SDL_GetKeyboardState(NULL);
-
-						// exit program
-						if (keys[SDL_SCANCODE_ESCAPE]) running = false;
-
-						break;
-				}
-			}
-			SDL_UpdateWindowSurface(window);
-		}
-		SDL_Quit();
-	}
-	
 	return 0;
-}
-
-/////////////////////////////////////////////////////////
-//
-// Screen Functions
-//
-/////////////////////////////////////////////////////////
-
-// initialize screen
-SDL_Window *init_screen(void)
-{
-	SDL_Window *window;
-	SDL_Surface *win_surface;
-	int scrw, scrh;								// screen dimensions for windows
-
-	// decide screen dimensions
-	if (debug) {
-		// screen dimensions for debug output
-		scrw = 480;
-		scrh = 422;
-	} else {
-		// default gameboy screen dimensions
-		scrw = 160;
-		scrh = 144;
-	}
-
-	// init window
-	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0) {
-		fprintf(stderr, "SDL2 err: %s\n", SDL_GetError());
-		p_error("failed to initialize SDL2 lib");
-	}
-
-	// open window
-	window = SDL_CreateWindow("gbemu",
-														SDL_WINDOWPOS_CENTERED,
-														SDL_WINDOWPOS_CENTERED,
-														scrw, scrh,	0);
-	if (!window) {
-		fprintf(stderr, "SDL2 err: %s\n", SDL_GetError());
-		p_error("failed to init window");
-	}
-
-	// grab window surface
-	win_surface = SDL_GetWindowSurface(window);
-	if (!win_surface) {
-		fprintf(stderr, "SDL2 err: %s\n", SDL_GetError());
-		p_error("failed to grab window surface");
-	}
-
-	return window;
 }
