@@ -29,7 +29,7 @@ uint16_t read_double(uint16_t address)
 	return dbl;
 }
 
-uint16_t read_stack(void)
+uint16_t pop_stack(void)
 {
 	return read_double(registers.sp);
 }
@@ -59,7 +59,7 @@ void write_double(uint16_t address, uint16_t dbl)
 	mem[address+1] = ms;
 }
 
-void write_stack(uint16_t dbl)
+void push_stack(uint16_t dbl)
 {
 	write_double(registers.sp, dbl);
 }

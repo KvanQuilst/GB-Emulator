@@ -36,7 +36,7 @@ uint16_t read_double(uint16_t address);
 
 // read a double byte from the stack's current pos
 // returns: the value at the stack pointer
-uint16_t read_stack(void);
+uint16_t pop_stack(void);
 
 // write a byte to the provided address
 // requires: an address to write to, the byte to be written
@@ -48,4 +48,4 @@ void write_double(uint16_t address, uint16_t dbl);
 
 // write a double byte value to the stack's current pos
 // requires: a double byte value
-void write_stack(uint16_t dbl);
+void push_stack(uint16_t dbl);

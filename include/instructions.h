@@ -107,6 +107,7 @@ static void cp_l(void);
 //static void cp_hla(void);
 static void cp_a(void);
 static void ldh_n_a(uint8_t operand);
+static void ld_nn_a(uint16_t operand);
 static void ldh_a_n(uint8_t operand);
 static void ld_a_nn(uint16_t operand);
 static void cp_n(uint8_t operand);
@@ -137,6 +138,7 @@ static void ld_c_a(void);
 
 // BC
 static void ld_bc_nn(uint16_t operand);
+static void ld_bc_a(void);
 static void inc_bc(void);
 static void dec_bc(void);
 
@@ -166,6 +168,7 @@ static void ld_e_a(void);
 
 // DE
 static void ld_de_nn(uint16_t operand);
+static void ld_de_a(void);
 static void inc_de(void);
 static void dec_de(void);
 
@@ -201,17 +204,23 @@ static void ldi_hl_a(void);
 static void inc_hl(void);
 static void add_hl_hl(void);
 static void dec_hl(void);
-static void add_hl_sp(void);
 //static void ldd_hl_a(void);
+static void add_hl_sp(void);
+static void ld_hl_a(void);
 
 // SP
 static void ld_sp_nn(uint16_t operand);
 static void inc_sp(void);
 static void dec_sp(void);
 static void pop_bc(void);
+static void ret_nz(void);
 static void push_bc(void);
+static void ret_z(void);
+static void ret(void);
+static void ret_nc(void);
 static void pop_de(void);
 static void push_de(void);
+static void ret_c(void);
 static void pop_hl(void);
 static void push_hl(void);
 static void add_sp(uint8_t operand);
@@ -229,9 +238,9 @@ static void jp_nn(uint16_t operand);
 
 const struct instruction instr[256] =
 {
-    {"nop",	0, nop, 1},										// 0x00
+    {"nop\t",	0, nop, 1},									// 0x00 tab for print alignment
     {"LD	BC,nn", 2, ld_bc_nn, 3},				// 0x01 
-    {"LD	(BC),A", 0, undefined, 2},			// 0x02
+    {"LD	(BC),A", 0, ld_bc_a, 2},				// 0x02
     {"INC	BC", 0, inc_bc, 2},							// 0x03
     {"INC	B", 0, inc_b, 1},								// 0x04
     {"DEC	B", 0, dec_b, 1},								// 0x05
@@ -247,7 +256,7 @@ const struct instruction instr[256] =
     {"RRCA", 0, undefined, 1},						// 0x0F
     {"STOP	n", 1, undefined, 1},					// 0x10
     {"LD	DE,nn", 2, ld_de_nn, 3},				// 0x11
-    {"LD	(DE),A", 0, ld_a_de, 2},				// 0x12
+    {"LD	(DE),A", 0, ld_de_a, 2},				// 0x12
     {"INC	DE", 0, inc_de, 2},							// 0x13
     {"INC	D", 0, inc_d, 1},								// 0x14
     {"DEC	D", 0, dec_d, 1},								// 0x15
@@ -255,7 +264,7 @@ const struct instruction instr[256] =
     {"RLA", 0, undefined, 1},							// 0X17
     {"JR	n", 1, jr, 3},									// 0x18
     {"ADD	HL,DE", 0, add_hl_de, 2},				// 0x19
-    {"LD	A,(DE)", 0, undefined, 2},			// 0x1A
+    {"LD	A,(DE)", 0, ld_a_de, 2},				// 0x1A
     {"DEC	DE", 0, dec_de, 2},							// 0x1B
     {"INC	E", 0, inc_e, 1},								// 0x1C
     {"DEC	E", 0, dec_e, 1},								// 0x1D
@@ -348,7 +357,7 @@ const struct instruction instr[256] =
     {"LD	(HL),H", 0, undefined, 2},			// 0x74
     {"LD	(HL),L", 0, undefined, 2},			// 0x75
     {"HALT", 0, undefined, 1},						// 0x76
-    {"LD	(HL),A", 0, undefined, 2},			// 0x77
+    {"LD	(HL),A", 0, ld_hl_a, 2},				// 0x77
     {"LD	A,B", 0, ld_a_b, 1},						// 0x78
     {"LD	A,C", 0, ld_a_c, 1},						// 0x79
     {"LD	A,D", 0, ld_a_d, 1},						// 0x7A
@@ -421,7 +430,7 @@ const struct instruction instr[256] =
     {"CP	L", 0, cp_l, 1},								// 0xBD
     {"CP	(HL)", 0, undefined, 2},				// 0xBE
     {"CP	A", 0, cp_a, 1},								// 0xBF
-    {"RET	NZ", 0, undefined, 5},					// 0xC0 timing 2 or 5
+    {"RET	NZ", 0, ret_nz, 5},							// 0xC0 timing 2 or 5
     {"POP	BC", 0, pop_bc, 3},							// 0xC1
     {"JP	NZ,nn", 2, undefined, 4},				// 0xC2 timing 3 or 4
     {"JP	nn", 2, jp_nn, 3},							// 0xC3
@@ -429,15 +438,15 @@ const struct instruction instr[256] =
     {"PUSH	BC", 0, push_bc, 4},					// 0xC5
     {"ADD	A,n", 1, add_n, 2},							// 0xC6
     {"RST	00H", 0, rst_00, 4},						// 0xC7
-    {"RET	Z", 0, undefined, 5},						// 0xC8 timing 2 or 5
-    {"RET", 0, undefined, 4},							// 0xC9
+    {"RET	Z", 0, ret_z, 5},								// 0xC8 timing 2 or 5
+    {"RET", 0, ret, 4},										// 0xC9
     {"JP	Z,nn", 2, undefined, 4},				// 0xCA timing 3 or 4
     {"PREFIX", 0, undefined, 1},					// 0xCB
     {"CALL	Z,nn", 2, call_z, 6},					// 0xCC timing 3 or 6
     {"CALL	nn", 2, call_nn, 6},					// 0xCD
     {"ADC	A,n", 1, undefined, 2},					// 0xCE
     {"RST	08H", 0, rst_08, 4},						// 0xCF
-    {"RET	NC", 0, undefined, 5},					// 0xD0 timing 2 or 5
+    {"RET	NC", 0, ret_nc, 5},							// 0xD0 timing 2 or 5
     {"POP	DE", 0, pop_de, 3},							// 0xD1
     {"JP	NC,nn", 2, undefined, 4},				// 0xD2 timing 3 or 4
     {"undefined", 0, undefined, 0},				// 0xD3
@@ -445,7 +454,7 @@ const struct instruction instr[256] =
     {"PUSH	DE", 0, push_de, 4},					// 0xD5
     {"SUB	n", 1, sub_n, 2},								// 0xD6
     {"RST	10H", 0, rst_10, 4},						// 0xD7
-    {"RET	C", 0, undefined, 5},						// 0xD8	timing 2 or 5
+    {"RET	C", 0, ret_c, 5},								// 0xD8	timing 2 or 5
     {"RETI", 0, undefined, 4},						// 0xD9
     {"JP	C,nn", 2, undefined, 4},				// 0xDA timing 3 or 4
     {"undefined", 0, undefined, 0},				// 0xDB
@@ -463,7 +472,7 @@ const struct instruction instr[256] =
     {"RST	20H", 0, rst_20, 4},						// 0xE7
     {"ADD	SP,n", 1, add_sp, 4},						// 0xE8
     {"JP	HL", 0, undefined, 1},					// 0xE9
-    {"LD	(nn),A", 2, undefined, 3},			// 0xEA
+    {"LD	(nn),A", 2, ld_nn_a, 3},				// 0xEA
     {"undefined", 0, undefined, 0},				// 0xEB
     {"undefined", 0, undefined, 0},				// 0xEC
     {"undefined", 0, undefined, 0},				// 0xED

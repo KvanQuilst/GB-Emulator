@@ -69,7 +69,7 @@ static void undefined(void)
 // requires: val to add to base
 static void rst(uint8_t val)
 {
-	write_stack(registers.pc);
+	push_stack(registers.pc);
 	registers.sp += 2;
 	registers.pc = val;
 }
@@ -229,7 +229,7 @@ static void call_z(uint16_t addr)
 // 0xCD CALL nn
 static void call_nn(uint16_t addr)
 {
-	write_stack(registers.pc);
+	push_stack(registers.pc);
 	registers.sp -= 2;
 	registers.pc = addr;
 }
@@ -473,6 +473,9 @@ static void ldh_n_a(uint8_t operand)
 	write_byte(0xFF00 + operand, registers.a);
 }
 
+// 0xEA LD (nn),A
+static void ld_nn_a(uint16_t operand) { write_byte(operand, registers.a); }
+
 // 0xF0 LDH A,(n)
 static void ldh_a_n(uint8_t operand)
 {
@@ -561,8 +564,11 @@ static void ld_c_a(void) { registers.c = registers.a; }
 //	BC
 ////
 
-// 0x02 LD BC,nn
+// 0x01 LD BC,nn
 static void ld_bc_nn(uint16_t operand) { registers.bc = operand; }
+
+// 0x02 LD (BC),A
+static void ld_bc_a(void) { write_byte(registers.bc, registers.a); }
 
 // 0x03 INC BC
 static void inc_bc(void) { registers.bc++; }
@@ -645,6 +651,9 @@ static void ld_e_a(void) { registers.e = registers.a; }
 
 // 0x11 LD DE,nn
 static void ld_de_nn(uint16_t operand) { registers.de = operand; }
+
+// 0x12 LD (DE),A
+static void ld_de_a(void) { write_byte(registers.de, registers.a); }
 
 // 0x13 INC DE
 static void inc_de(void) {	registers.de++; }
@@ -755,6 +764,9 @@ static void dec_hl(void) {	registers.hl--; }
 // 0x39 ADD HL,SP
 static void add_hl_sp(void) { add_hl(registers.sp); }
 
+// 0x77 LD (HL),A
+static void ld_hl_a(void) { write_byte(registers.hl, registers.a); }
+
 
 ////
 //	SP
@@ -769,45 +781,60 @@ static void inc_sp(void) { registers.sp++; }
 // 0x3B DEC SP
 static void dec_sp(void) { registers.sp--; }
 
+// 0xC0 RET NZ
+static void ret_nz(void) { if (!(registers.f & 0x80)) ret(); }
+
 // 0xC1 POP BC
 static void pop_bc(void) 
 {
-	registers.bc = read_stack();
+	registers.bc = pop_stack();
 	registers.sp += 2;
 }
 
 // 0xC5 PUSH BC
 static void push_bc(void) 
 {
-	write_stack(registers.bc);
+	push_stack(registers.bc);
 	registers.sp -= 2;
 }
+
+// 0xC8 RET Z
+static void ret_z(void) { if (registers.f & 0x80) ret(); }
+
+// 0xC9 RET
+static void ret(void) { registers.pc = pop_stack(); }
+
+// 0xD0 RET NC
+static void ret_nc(void) { if (!(registers.f & 0x10)) ret(); }
 
 // 0xD1 POP DE
 static void pop_de(void) 
 {
-	registers.de = read_stack();
+	registers.de = pop_stack();
 	registers.sp += 2;
 }
 
 // 0xD5 PUSH DE
 static void push_de(void) 
 {
-	write_stack(registers.de);
+	push_stack(registers.de);
 	registers.sp -= 2;
 }
+
+// 0xD8 RET C
+static void ret_c(void) { if (registers.f & 0x10) ret(); }
 
 // 0xE1 POP HL
 static void pop_hl(void) 
 {
-	registers.hl = read_stack();
+	registers.hl = pop_stack();
 	registers.sp += 2;
 }
 
 // 0xE5 PUSH HL
 static void push_hl(void) 
 {
-	write_stack(registers.hl);
+	push_stack(registers.hl);
 	registers.sp -= 2;
 }
 
@@ -824,7 +851,7 @@ static void add_sp(uint8_t operand)
 // 0xF1 POP AF
 static void pop_af(void) 
 {
-	registers.af = read_stack();
+	registers.af = pop_stack();
 	registers.sp += 2;
 }
 
@@ -832,7 +859,7 @@ static void pop_af(void)
 static void push_af(void) 
 {
 	registers.sp -= 2;
-	write_stack(registers.af);
+	push_stack(registers.af);
 }
 
 ////
