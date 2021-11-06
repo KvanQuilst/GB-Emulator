@@ -11,7 +11,7 @@ struct instruction
 {
     char *disas;        // instruction disassembly
     uint8_t ops;        // number of operands (0-2)
-    void *exec;  // function to execute instruction
+    void *exec;         // function to execute instruction
     uint8_t ticks;      // machine time needed
 };
 
@@ -19,6 +19,7 @@ static void undefined(void);
 
 // Misc
 static void nop(void);
+static void stop(void);
 static void cpl(void);
 static void scf(void);
 static void ccf(void);
@@ -204,7 +205,7 @@ static void ldi_hl_a(void);
 static void inc_hl(void);
 static void add_hl_hl(void);
 static void dec_hl(void);
-//static void ldd_hl_a(void);
+static void ldd_hl_a(void);
 static void add_hl_sp(void);
 static void ld_hl_a(void);
 
@@ -229,6 +230,7 @@ static void push_af(void);
 
 // PC
 static void jr(uint8_t operand);
+static void jr_nz(uint8_t operand);
 static void jr_z(uint8_t operand);
 static void jp_nn(uint16_t operand);
 
@@ -254,7 +256,7 @@ const struct instruction instr[256] =
     {"DEC	C", 0, dec_c, 1},								// 0x0D
     {"LD	C,n", 1, ld_c_n, 2},						// 0x0E
     {"RRCA", 0, undefined, 1},						// 0x0F
-    {"STOP	n", 1, undefined, 1},					// 0x10
+    {"STOP\t", 1, stop, 1},					      // 0x10
     {"LD	DE,nn", 2, ld_de_nn, 3},				// 0x11
     {"LD	(DE),A", 0, ld_de_a, 2},				// 0x12
     {"INC	DE", 0, inc_de, 2},							// 0x13
@@ -270,7 +272,7 @@ const struct instruction instr[256] =
     {"DEC	E", 0, dec_e, 1},								// 0x1D
     {"LD	E,n", 1, ld_e_n, 2},						// 0x1E
     {"RRA", 0, undefined, 1},							// 0x1F
-    {"STOP", 0, undefined, 2},						// 0x20
+    {"JR NZ,n", 0, jr_nz, 12},		        // 0x20 timing 8 or 12
     {"LD	HL,nn", 2, ld_hl_nn, 3},				// 0x21 timing is 2 or 3
     {"LD	(HL+),A", 0, ldi_hl_a, 2},			// 0X22
     {"INC	HL", 0, inc_hl, 2},							// 0x23
@@ -288,7 +290,7 @@ const struct instruction instr[256] =
     {"CPL", 0, cpl, 1},										// 0x2F
     {"JR	NC,n", 0, undefined, 3},				// 0x30 timing is 2 or 3
     {"LD	SP,nn", 2, ld_sp_nn, 3},				// 0x31
-    {"LD	(HL-),A", 0, undefined, 2},			// 0x32
+    {"LD	(HL-),A", 0, ldd_hl_a, 2},			// 0x32
     {"INC	SP", 0, inc_sp, 2},							// 0x33
     {"INC	(HL)", 0, undefined, 3},				// 0x34
     {"DEC	(HL)", 0, undefined, 3},				// 0x35

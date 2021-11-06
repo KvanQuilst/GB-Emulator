@@ -12,6 +12,8 @@
 #include "cpu.h"
 #include "instructions.h"
 
+bool stopped;
+
 uint8_t cpu_step(void)
 {
 	uint8_t instruction = read_byte(registers.pc);
@@ -188,6 +190,9 @@ static void cp(uint8_t val)
 
 // 0x00 NOP
 static void nop(void) {}
+
+// 0x10 STOP
+static void stop(void) { stopped = true; }
 
 // 0x2F CPL
 static void cpl(void)
@@ -746,20 +751,17 @@ static void ld_hl_nn(uint16_t operand) { registers.hl = operand; }
 // 0x22 LD (HL+),A
 static void ldi_hl_a(void) { write_byte(registers.hl++, registers.a); }
 
-// 0x22 LD (HL+),A
-//static void ldi_hl_a(void) { }
-
 // 0x23 INC HL
-static void inc_hl(void) {registers.hl++; }
+static void inc_hl(void) { registers.hl++; }
 
 // 0x29 ADD HL,HL
 static void add_hl_hl(void) { add_hl(registers.hl); }
 
 // 0x2B DEC HL
-static void dec_hl(void) {	registers.hl--; }
+static void dec_hl(void) { registers.hl--; }
 
 // 0x32 LDD (HL-),A
-//static void ldd_hl_a(void) { }
+static void ldd_hl_a(void) { write_byte(registers.hl--, registers.a); }
 
 // 0x39 ADD HL,SP
 static void add_hl_sp(void) { add_hl(registers.sp); }
@@ -872,6 +874,9 @@ static void jr(uint8_t operand)
 	registers.pc += ((operand>>7) * operand & 0x7F)
 							 + (!(operand>>7) * operand & 0x7F);
 }
+
+// 0x20 JR NZ,n (signed)
+static void jr_nz(uint8_t operand) { if (!(registers.f >> 7)) jr(operand); }
 
 // 0x28 JR Z,n (signed)
 static void jr_z(uint8_t operand) { if (registers.f >> 7) jr(operand); }

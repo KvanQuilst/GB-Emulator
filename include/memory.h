@@ -22,7 +22,13 @@
 #define IO	 0xFF00
 #define HRAM 0xFF80
 
+// Notable Registers
+#define LCDC 0xFF40
+
 extern uint8_t mem[0xFFFF];
+
+// initialize memory with the appropriate values
+void init_mem(void);
 
 // read a byte from the memory address space
 // requires: an address for reading from

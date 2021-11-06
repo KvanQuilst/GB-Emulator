@@ -26,6 +26,11 @@
 
 bool debug = false;	// debug flag
 
+SDL_Window *window;
+SDL_Surface *surface;
+SDL_Event e;
+bool running;
+
 ///////////////
 //
 // PROTOTYPES
@@ -104,13 +109,36 @@ int main(int argc, char **argv)
 
 	registers.pc = ROM_START;
 
-	if (!nowin) gpu_init();
-
 	// print legend for debug info
-	if (debug) 
-		printf("Instr\t\t\tOP\trF\trA\trB\trC\trD\trE\trH\trL\trSP\trPC\n");
-	else printf("\n");
+	if (debug) printf("Instr\t\t\tOP\trF\trA\trB\trC\trD\trE\trH\trL\trSP\trPC\n");
 	
+///////////////////////////////////////////////////////////
+//
+// GPU Initialization
+//
+///////////////////////////////////////////////////////////
+
+  //gpu_init();
+
+	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+		p_error("error\n");
+	}
+	atexit(SDL_Quit);
+
+	window = SDL_CreateWindow("gbemu",
+														SDL_WINDOWPOS_CENTERED,
+														SDL_WINDOWPOS_CENTERED,
+														160, 144, 0);
+	if (!window) {
+		p_error("error\n");
+	}
+
+	surface = SDL_GetWindowSurface(window);
+	if (!surface) {
+		p_error("error\n");
+	}
+
+	SDL_UpdateWindowSurface(window);
 
 ///////////////////////////////////////////////////////////
 //
@@ -120,7 +148,22 @@ int main(int argc, char **argv)
 
 	while (running) {
 		cpu_step();
-		if (!nowin) gpu_step();
+
+    while (!nowin && SDL_PollEvent(&e) > 0) {
+      switch(e.type) {
+        case SDL_QUIT:
+          running = false;
+          break;
+
+        case SDL_KEYDOWN:
+          uint8_t const *keys = SDL_GetKeyboardState(NULL);
+
+          if (keys[SDL_SCANCODE_ESCAPE] == 1) running = false;
+          break;
+      }
+	  }
+
+	  SDL_UpdateWindowSurface(window);
 	}
 
 	return 0;
