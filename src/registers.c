@@ -32,7 +32,7 @@ void printRegs(uint16_t operand, int bytes)
 	else printf("\t\t");
 
 	/*						rF	rA  rB	rC	rD	rE	rH	rL	rSP	 rPC*/
-	printf(" %s\t0x%02x\t0x%02x\t0x%02x\t0x%02x\t0x%02x\t",
+	printf("%s\t0x%02x\t0x%02x\t0x%02x\t0x%02x\t0x%02x\t",
 			flags,
 			registers.a,
 			registers.b,
