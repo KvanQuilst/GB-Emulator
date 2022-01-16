@@ -12,7 +12,7 @@
 #include "cpu.h"
 #include "instructions.h"
 
-bool stopped;
+bool stopped = false;
 
 uint8_t cpu_step(void)
 {
@@ -79,28 +79,31 @@ static void rst(uint8_t val)
 // increase values and set flags
 // requires: val to increase
 // returns: increased value
-static uint8_t inc(uint8_t val)
+static void inc(uint8_t *val)
 {
+  uint8_t v = *val;
 
 	// unset NEG_ and HALF_FLAG
 	registers.f &= !(ZERO_FLAG + NEG_FLAG + HALF_FLAG); 	
-	registers.f |= ((val & 0x0f) == 0x0f) * HALF_FLAG;
-	val++;
-	registers.f |= (val == 0) * ZERO_FLAG;
-	return val;
+	registers.f |= ((v & 0x0f) == 0x0f) * HALF_FLAG;
+	v++;
+	registers.f |= (v == 0) * ZERO_FLAG;
+  *val = v;
 }
 
 // decrease values and set flags
 // requires: val to decrease
 // returns: decreased value
-static uint8_t dec(uint8_t val)
+static void dec(uint8_t *val)
 {
+  uint8_t v = *val;
+
 	registers.f &= !(ZERO_FLAG + HALF_FLAG);
-	registers.f |= (val & 0x0f) * HALF_FLAG;
-	val--;
+	registers.f |= (v & 0x0f) * HALF_FLAG;
+	v--;
 	registers.f |= (val == 0) * ZERO_FLAG
 				+  NEG_FLAG;
-	return val;
+	*val = v;
 }
 
 // add val to A and set flags
@@ -194,6 +197,27 @@ static void nop(void) {}
 // 0x10 STOP
 static void stop(void) { stopped = true; }
 
+// 0x27 DAA
+static void daa(void)
+{
+  if (!(registers.f & NEG_FLAG)) {
+    if (registers.f & CARRY_FLAG || registers.a > 0x99) {
+      registers.a += 0x60; 
+      registers.f |= CARRY_FLAG;
+    }
+    if (registers.f & HALF_FLAG || (registers.a & 0x0F) > 0x09) {
+      registers.a += 0x06;
+    }
+  } else {
+    if (registers.f & CARRY_FLAG) registers.a -= 0x60;
+    if (registers.f & HALF_FLAG) registers.a -= 0x06;
+  }
+
+  registers.f &= !ZERO_FLAG;
+  registers.f |= ZERO_FLAG * (registers.a == 0);
+  registers.f &= !HALF_FLAG;
+}
+
 // 0x2F CPL
 static void cpl(void)
 {
@@ -215,6 +239,9 @@ static void ccf(void)
 	registers.f ^= CARRY_FLAG;
 }
 
+// 0x76 HALT
+static void halt(void) { stopped = true; }
+
 ////
 //	Calls
 ////
@@ -222,13 +249,13 @@ static void ccf(void)
 // 0xC4 CALL NZ,nn
 static void call_nz(uint16_t addr)
 {
-	if (!(registers.f & 0x80)) registers.pc = addr;
+	if (!(registers.f & ZERO_FLAG)) registers.pc = addr;
 }
 
 // 0xCC CALL Z,nn
 static void call_z(uint16_t addr)
 {
-	if (registers.f & 0x80) registers.pc = addr;
+	if (registers.f & ZERO_FLAG) registers.pc = addr;
 }
 
 // 0xCD CALL nn
@@ -289,11 +316,14 @@ static void ld_a_bc(void) { ld_a_nn(registers.bc); }
 // 0x1A LD A,(DE)
 static void ld_a_de(void) { ld_a_nn(registers.de); }
 
+// 0x2A LD A,(HL+)
+static void ldi_a_hl(void) { ld_a_nn(registers.hl++); }
+
 // 0x3C INC A
-static void inc_a(void) { registers.a = inc(registers.a); }
+static void inc_a(void) { inc(&registers.a); }
 
 // 0x3D DEC A
-static void dec_a(void) { registers.a = dec(registers.a); }
+static void dec_a(void) { dec(&registers.a); }
 
 // 0x3E LD A,n
 static void ld_a_n(uint8_t operand) { registers.a = operand; }
@@ -502,10 +532,10 @@ static void cp_n(uint8_t operand) { cp(operand); }
 ///
 
 // 0x04 INC B
-static void inc_b(void) { registers.b = inc(registers.b); }
+static void inc_b(void) { inc(&registers.b); }
 
 // 0x05 DEC B
-static void dec_b(void) { registers.b = dec(registers.b); }
+static void dec_b(void) { dec(&registers.b); }
 
 // 0x06 LD B,n
 static void ld_b_n(uint8_t operand) { registers.b = operand; }
@@ -526,6 +556,7 @@ static void ld_b_h(void) { registers.b = registers.h; }
 static void ld_b_l(void) { registers.b = registers.l; }
 
 // 0x46 LD B,(HL)
+static void ld_b_hl(void) {registers.b = read_byte(registers.hl); }
 
 // 0x47 LD B,A
 static void ld_b_a(void) { registers.b = registers.a; }
@@ -536,10 +567,10 @@ static void ld_b_a(void) { registers.b = registers.a; }
 ////
 
 // 0x0C INC C
-static void inc_c(void) { registers.c = inc(registers.c); }
+static void inc_c(void) { inc(&registers.c); }
 
 // 0x0D DEC C
-static void dec_c(void) { registers.c = dec(registers.c); }
+static void dec_c(void) { dec(&registers.c); }
 
 // 0x0E LD C,n
 static void ld_c_n(uint8_t operand) { registers.c = operand; }
@@ -560,9 +591,13 @@ static void ld_c_h(void) { registers.c = registers.h; }
 static void ld_c_l(void) { registers.c = registers.l; }
 
 // 0x4E LD C,(HL)
+static void ld_c_hl(void) { registers.c = read_byte(registers.hl); }
 
-//0x4F LD, C,A
+// 0x4F LD C,A
 static void ld_c_a(void) { registers.c = registers.a; }
+
+// 0xE4 LD (C),AS
+static void ld_ca_a(void) { write_byte(0xFF+registers.c, registers.a); }
 
 
 ////
@@ -587,10 +622,10 @@ static void dec_bc(void) {	registers.bc--; }
 ////
 
 // 0x14 INC D
-static void inc_d(void) { registers.d = inc(registers.d); }
+static void inc_d(void) { inc(&registers.d); }
 
 // 0x15 DEC D
-static void dec_d(void) { registers.d = dec(registers.d); }
+static void dec_d(void) { dec(&registers.d); }
 
 // 0x16 LD D,n
 static void ld_d_n(uint8_t operand) { registers.d = operand; }
@@ -611,6 +646,7 @@ static void ld_d_h(void) { registers.d = registers.h; }
 static void ld_d_l(void) { registers.d = registers.l; }
 
 // 0x56 LD D,(HL)
+static void ld_d_hl(void) {registers.d = read_byte(registers.hl); }
 
 // 0x57 LD D,A
 static void ld_d_a(void) { registers.d = registers.a; }
@@ -621,10 +657,10 @@ static void ld_d_a(void) { registers.d = registers.a; }
 ////
 
 // 0x1C INC E
-static void inc_e(void) { registers.e = inc(registers.e); }
+static void inc_e(void) { inc(&registers.e); }
 
 // 0x1D DEC E
-static void dec_e(void) { registers.e = dec(registers.e); }
+static void dec_e(void) { dec(&registers.e); }
 
 // 0x1E LD E,n
 static void ld_e_n(uint8_t operand) { registers.e = operand; }
@@ -672,10 +708,10 @@ static void dec_de(void) {	registers.de--; }
 ////
 
 // 0x24 INC H
-static void inc_h(void) { registers.h = inc(registers.h); }
+static void inc_h(void) { inc(&registers.h); }
 
 // 0x25 DEC H
-static void dec_h(void) { registers.h = dec(registers.h); }
+static void dec_h(void) { dec(&registers.h); }
 
 // 0x26 LD H,n
 static void ld_h_n(uint8_t operand) { registers.h = operand; }
@@ -696,6 +732,7 @@ static void ld_h_e(void) { registers.h = registers.e; }
 static void ld_h_l(void) { registers.h = registers.l; }
 
 // 0x66 LD H,(HL)
+static void ld_h_hl(void) { registers.h = read_byte(registers.hl); }
 
 // 0x67 LD H,A
 static void ld_h_a(void) { registers.h = registers.a; }
@@ -706,10 +743,10 @@ static void ld_h_a(void) { registers.h = registers.a; }
 ////
 
 // 0x2C INC L
-static void inc_l(void) { registers.l = inc(registers.l); }
+static void inc_l(void) { inc(&registers.l); }
 
 // 0x2D DEC L
-static void dec_l(void) { registers.l = dec(registers.l); }
+static void dec_l(void) { dec(&registers.l); }
 
 // 0x2E LD L,n
 static void ld_l_n(uint8_t operand) { registers.l = operand; }
@@ -730,6 +767,7 @@ static void ld_l_e(void) { registers.l = registers.e; }
 static void ld_l_h(void) { registers.l = registers.h; }
 
 // 0x6E LD L,(HL)
+static void ld_l_hl(void) { registers.l = read_byte(registers.hl); }
 
 // 0x6F LD L,A
 static void ld_l_a(void) { registers.l = registers.a; }

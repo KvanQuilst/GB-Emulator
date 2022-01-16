@@ -147,7 +147,8 @@ int main(int argc, char **argv)
 ///////////////////////////////////////////////////////////
 
 	while (running) {
-		cpu_step();
+    if (!stopped)
+		  cpu_step();
 
     while (!nowin && SDL_PollEvent(&e) > 0) {
       switch(e.type) {

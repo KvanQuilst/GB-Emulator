@@ -20,9 +20,11 @@ static void undefined(void);
 // Misc
 static void nop(void);
 static void stop(void);
+static void daa(void);
 static void cpl(void);
 static void scf(void);
 static void ccf(void);
+static void halt(void);
 
 // Calls
 static void call_nn(uint16_t addr);
@@ -44,6 +46,7 @@ static void rst_38(void);
 // A
 static void ld_a_bc(void);
 static void ld_a_de(void);
+static void ldi_a_hl(void);
 static void inc_a(void);
 static void dec_a(void);
 static void ld_a_n(uint8_t operand);
@@ -122,7 +125,7 @@ static void ld_b_d(void);
 static void ld_b_e(void);
 static void ld_b_h(void);
 static void ld_b_l(void);
-//static void ld_b_hla(void);
+static void ld_b_hl(void);
 static void ld_b_a(void);
 
 // C
@@ -134,8 +137,9 @@ static void ld_c_d(void);
 static void ld_c_e(void);
 static void ld_c_h(void);
 static void ld_c_l(void);
-//static void ld_c_hla(void);
+static void ld_c_hl(void);
 static void ld_c_a(void);
+static void ld_ca_a(void);
 
 // BC
 static void ld_bc_nn(uint16_t operand);
@@ -152,7 +156,7 @@ static void ld_d_c(void);
 static void ld_d_e(void);
 static void ld_d_h(void);
 static void ld_d_l(void);
-//static void ld_d_hla(void);
+static void ld_d_hl(void);
 static void ld_d_a(void);
 
 // E
@@ -182,7 +186,7 @@ static void ld_h_c(void);
 static void ld_h_d(void);
 static void ld_h_e(void);
 static void ld_h_l(void);
-//static void ld_h_hla(void);
+static void ld_h_hl(void);
 static void ld_h_a(void);
 
 // L
@@ -194,7 +198,7 @@ static void ld_l_c(void);
 static void ld_l_d(void);
 static void ld_l_e(void);
 static void ld_l_h(void);
-//static void ld_l_hla(void);
+static void ld_l_hl(void);
 static void ld_l_a(void);
 
 // HL
@@ -272,17 +276,17 @@ const struct instruction instr[256] =
     {"DEC	E", 0, dec_e, 1},								// 0x1D
     {"LD	E,n", 1, ld_e_n, 2},						// 0x1E
     {"RRA", 0, undefined, 1},							// 0x1F
-    {"JR\tNZ,n", 2, jr_nz, 12},		      // 0x20 timing 8 or 12
+    {"JR\tNZ,n", 2, jr_nz, 12},		        // 0x20 timing 8 or 12
     {"LD	HL,nn", 2, ld_hl_nn, 3},				// 0x21 timing is 2 or 3
     {"LD	(HL+),A", 0, ldi_hl_a, 2},			// 0X22
     {"INC	HL", 0, inc_hl, 2},							// 0x23
     {"INC	H", 0, inc_h, 1},								// 0x24
     {"DEC	H", 0, dec_h, 1},								// 0x25
     {"LD	H,n", 1, ld_h_n, 2},						// 0x26
-    {"DAA", 0, undefined, 1},							// 0x27
+    {"DAA\t", 0, daa, 1},		      				// 0x27
     {"JR	Z,n", 1, jr_z, 3},							// 0x28 timing is 2 or 3
     {"ADD	HL,HL", 0, add_hl_hl, 2},				// 0x29
-    {"LD	A,(HL+)", 0, undefined, 2},			// 0x2A
+    {"LD	A,(HL+)", 0, ldi_a_hl, 2},			// 0x2A
     {"DEC	HL", 0, dec_hl, 2},							// 0x2B
     {"INC	L", 0, inc_l, 1},								// 0x2C
     {"DEC	L", 0, dec_l, 1},								// 0x2D
@@ -303,14 +307,14 @@ const struct instruction instr[256] =
     {"INC	A", 0, inc_a, 1},								// 0x3C
     {"DEC	A", 0, dec_a, 1},								// 0x3D
     {"LD	A,n", 0, ld_a_n, 2},						// 0x3E
-    {"CCF", 0, ccf, 1},										// 0x3F
+    {"CCF\t", 0, ccf, 1},									// 0x3F
     {"LD	B,B", 0, nop, 1},								// 0x40
     {"LD	B,C", 0, ld_b_c, 1},						// 0x41
     {"LD	B,D", 0, ld_b_d, 1},						// 0x42
     {"LD	B,E", 0, ld_b_e, 1},						// 0x43
     {"LD	B,H", 0, ld_b_h, 1},						// 0x44
     {"LD	B,L", 0, ld_b_l, 1},						// 0x45
-    {"LD	B,(HL)", 0, undefined, 2},			// 0x46
+    {"LD	B,(HL)", 0, ld_b_hl, 2},			  // 0x46
     {"LD	B,A", 0, ld_b_a, 1},						// 0x47
     {"LD	C,B", 0, ld_c_b, 1},						// 0x48
     {"LD	C,C", 0, nop, 1},								// 0x49
@@ -318,7 +322,7 @@ const struct instruction instr[256] =
     {"LD	C,E", 0, ld_c_e, 1},						// 0x4B
     {"LD	C,H", 0, ld_c_h, 1},						// 0x4C
     {"LD	C,L", 0, ld_c_l, 1},						// 0x4D
-    {"LD	C,(HL)", 0, undefined, 2},			// 0x4E
+    {"LD	C,(HL)", 0, ld_c_hl, 2},			  // 0x4E
     {"LD	C,A", 0, ld_c_a, 1},						// 0x4F
     {"LD	D,B", 0, ld_d_b, 1},						// 0x50
     {"LD	D,C", 0, ld_d_c, 1},						// 0x51
@@ -326,7 +330,7 @@ const struct instruction instr[256] =
     {"LD	D,E", 0, ld_d_e, 1},						// 0x53
     {"LD	D,H", 0, ld_d_h, 1},						// 0x54
     {"LD	D,L", 0, ld_d_l, 1},						// 0x55
-    {"LD	D,(HL)", 0, undefined, 2},			// 0x56
+    {"LD	D,(HL)", 0, ld_d_hl, 2},			  // 0x56
     {"LD	D,A", 0, ld_d_a, 1},						// 0x57
     {"LD	E,B", 0, ld_e_b, 1},						// 0x58
     {"LD	E,C", 0, ld_e_c, 1},						// 0x59
@@ -342,7 +346,7 @@ const struct instruction instr[256] =
     {"LD	H,E", 0, ld_h_e, 1},						// 0x63
     {"LD	H,H", 0, nop, 1},								// 0x64
     {"LD	H,L", 0, ld_h_l, 1},						// 0x65
-    {"LD	H,(HL)", 0, undefined, 2},			// 0x66
+    {"LD	H,(HL)", 0, ld_h_hl, 2},			  // 0x66
     {"LD	H,A", 0, ld_h_a, 1},						// 0x67
     {"LD	L,B", 0, ld_l_b, 1},						// 0x68
     {"LD	L,C", 0, ld_l_c, 1},						// 0x69
@@ -350,7 +354,7 @@ const struct instruction instr[256] =
     {"LD	L,E", 0, ld_l_e, 1},						// 0x6B
     {"LD	L,H", 0, ld_l_h, 1},						// 0x6C
     {"LD	L,L", 0, nop, 1},								// 0x6D
-    {"LD	L,(HL)", 0, undefined, 2},			// 0x6E
+    {"LD	L,(HL)", 0, ld_l_hl, 2},			  // 0x6E
     {"LD	L,A", 0, ld_l_a, 1},						// 0x6F
     {"LD	(HL),B", 0, undefined, 2},			// 0x70
     {"LD	(HL),C", 0, undefined, 2},			// 0x71
@@ -358,7 +362,7 @@ const struct instruction instr[256] =
     {"LD	(HL),E", 0, undefined, 2},			// 0x73
     {"LD	(HL),H", 0, undefined, 2},			// 0x74
     {"LD	(HL),L", 0, undefined, 2},			// 0x75
-    {"HALT", 0, undefined, 1},						// 0x76
+    {"HALT\t", 0, halt, 1},     		  		// 0x76
     {"LD	(HL),A", 0, ld_hl_a, 2},				// 0x77
     {"LD	A,B", 0, ld_a_b, 1},						// 0x78
     {"LD	A,C", 0, ld_a_c, 1},						// 0x79
@@ -466,7 +470,7 @@ const struct instruction instr[256] =
     {"RST	18H", 0, rst_18, 4},						// 0xDF
     {"LDH	(n),A", 1, ldh_n_a, 3},					// 0xE0
     {"POP	HL", 0, pop_hl, 3},							// 0xE1
-    {"LD	(C),A", 0, undefined, 2},				// 0xE2
+    {"LD	(C),A", 0, ld_ca_a, 2},				  // 0xE2
     {"0xE3 undefined", 0, undefined, 0},  // 0xE3
     {"0xE4 undefined", 0, undefined, 0},	// 0xE4
     {"PUSH	HL", 0, push_hl, 4},					// 0xE5
