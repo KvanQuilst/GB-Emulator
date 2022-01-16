@@ -1,12 +1,11 @@
 # Makefile for gbemu
 
 SDIR		:= src
-IDIR		:= include
 ODIR		:= obs
 CFILES	:= $(wildcard $(SDIR)/*.c)
 OBJS		:= $(patsubst $(SDIR)/%.c, $(ODIR)/%.o, $(CFILES))
 CC			:= gcc
-CFLAGS	:= -g -Wall -iquote $(IDIR)
+CFLAGS	:= -g -Wall
 LFLAGS	:= `sdl2-config --cflags --libs`
 
 gbemu: $(ODIR) $(OBJS)
