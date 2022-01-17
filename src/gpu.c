@@ -82,9 +82,9 @@ void gpu_init(void)
 
   for (i = 0; i < 255; i++) {
     offset = (WIDTH * 4 * i) + i * 4;        
-    pixels[offset + 0] = 100;
-    pixels[offset + 1] = 100;
-    pixels[offset + 2] = 100;
+    pixels[offset + 0] = (uint8_t) (0xFF0000 & GREY2) >> 4;
+    pixels[offset + 1] = (uint8_t) (0x00FF00 & GREY2) >> 2;
+    pixels[offset + 2] = (uint8_t) (0x0000FF & GREY2);
     pixels[offset + 3] = SDL_ALPHA_OPAQUE;
   }
 
