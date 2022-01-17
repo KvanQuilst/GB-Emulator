@@ -13,7 +13,7 @@
 
 extern bool running;
 extern SDL_Window *window;
-extern SDL_Surface *surface;
+extern SDL_Renderer *renderer;
 extern SDL_Event e;
 
 void gpu_init(void);

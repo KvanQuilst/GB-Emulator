@@ -108,34 +108,7 @@ int main(int argc, char **argv)
 	// print legend for debug info
 	if (debug) printf("Instr\t\t\tOP\trF\trA\trB\trC\trD\trE\trH\trL\trSP\trPC\n");
 	
-///////////////////////////////////////////////////////////
-//
-// GPU Initialization
-//
-///////////////////////////////////////////////////////////
-
-  //gpu_init();
-
-	if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-		p_error("error\n");
-	}
-	atexit(SDL_Quit);
-
-	window = SDL_CreateWindow("gbemu",
-														SDL_WINDOWPOS_CENTERED,
-														SDL_WINDOWPOS_CENTERED,
-														HEIGHT, WIDTH, 0);
-                            //160, 144, 0);
-	if (!window) {
-		p_error("error\n");
-	}
-
-	surface = SDL_GetWindowSurface(window);
-	if (!surface) {
-		p_error("error\n");
-	}
-
-	SDL_UpdateWindowSurface(window);
+  gpu_init();
 
 ///////////////////////////////////////////////////////////
 //
@@ -157,15 +130,16 @@ int main(int argc, char **argv)
           uint8_t const *keys = SDL_GetKeyboardState(NULL);
 
           if (keys[SDL_SCANCODE_ESCAPE] == 1) running = false;
+
+          if (keys[SDL_SCANCODE_RETURN] == 1) stopped = false;
           break;
       }
 	  }
 
-	  SDL_UpdateWindowSurface(window);
+    SDL_RenderPresent(renderer);
 	}
 
   SDL_DestroyWindow(window);
-  SDL_Quit();
 
 	return 0;
 }
