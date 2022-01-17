@@ -6,9 +6,8 @@
 
 #include <SDL2/SDL.h>
 
-#include "memory.h"
-#include "registers.h"
 #include "gpu.h"
+#include "memory.h"
 
 /*struct tile
 {
@@ -18,12 +17,14 @@
 ////
 //	Globals
 ////
+SDL_Window *window;
+SDL_Surface *surface;
+SDL_Event e;
 
-//struct tile tile_set[TILE_NUM];
-uint8_t tile_set[TILE_NUM][8][8];
+uint8_t pixels[HEIGHT*WIDTH] = {0};
 
 // print error message and exit with code 1
-void g_error(const char *msg)
+static void g_error(const char *msg)
 {
 	fprintf(stderr, "gpu error: %s\n", msg);
 	exit(1);
@@ -32,45 +33,14 @@ void g_error(const char *msg)
 // process any frame rendering
 void gpu_step(void)
 {
-	SDL_UpdateWindowSurface(window);
+  g_error("no");
 }
 
 // initialize gpu data
 void gpu_init(void)
 {
-  uint8_t *ptr;
-  uint8_t offset;
-  uint8_t line1, line2;
-  int i, j, k;
-
-  // TILE MAP
-  ptr = &mem[VRAM + 0x0800 * (!(mem[LCDC] & 0x10))];
-  
-  for (i = 0; i < TILE_NUM; i++) {
-    offset = i * 16;
-    for (j = 0; j < 8; j++) {
-      line1 = ptr[j*offset];
-      line2 = ptr[j*offset+1];
-      //printf("line 1: %u | line 2: %u\n", line1, line2);
-      for (k = 0; k < 8; k++) {
-        tile_set[i][j][k] = ((line1>>(7-k)) & 0x1)
-                          + (((line2>>(7-k)) & 0x1) * 2);
-      }
-    }
-    //print_tile (tile_set[i]);
-    //printf("\n");
-  }
-}
-
-// print a tile
-void print_tile(uint8_t tile[8][8])
-{
+  uint8_t lcdc = read_byte(LCDC);
+  uint16_t addr = (lcdc & 0x04) ? 0x9C00 : 0x9800;
   int i, j;
 
-  for (i = 0; i < 8; i++) {
-    for (j = 0; j < 8; j++) {
-      printf("%u", tile[i][j]);
-    }
-    printf("\n");
-  }
 }

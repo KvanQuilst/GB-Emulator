@@ -11,7 +11,6 @@
 #include <string.h>
 
 #include "memory.h"
-
 #include "rom.h"
 
 const char *rom_string[256] = 

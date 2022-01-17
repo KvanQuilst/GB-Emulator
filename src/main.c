@@ -26,9 +26,6 @@
 
 bool debug = false;	// debug flag
 
-SDL_Window *window;
-SDL_Surface *surface;
-SDL_Event e;
 bool running;
 
 ///////////////
@@ -36,7 +33,6 @@ bool running;
 // PROTOTYPES
 //
 ///////////////
-
 // print a message regarding the usage of gbemu
 // automatically exits program with exit code 1
 void usage(char *msg)
@@ -128,7 +124,8 @@ int main(int argc, char **argv)
 	window = SDL_CreateWindow("gbemu",
 														SDL_WINDOWPOS_CENTERED,
 														SDL_WINDOWPOS_CENTERED,
-														160, 144, 0);
+														HEIGHT, WIDTH, 0);
+                            //160, 144, 0);
 	if (!window) {
 		p_error("error\n");
 	}
@@ -166,6 +163,9 @@ int main(int argc, char **argv)
 
 	  SDL_UpdateWindowSurface(window);
 	}
+
+  SDL_DestroyWindow(window);
+  SDL_Quit();
 
 	return 0;
 }

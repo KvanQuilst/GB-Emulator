@@ -5,12 +5,11 @@
  * 
  */
 
+#include "cpu.h"
+#include "instructions.h"
 #include "global.h"
 #include "memory.h"
 #include "registers.h"
-
-#include "cpu.h"
-#include "instructions.h"
 
 bool stopped = false;
 
