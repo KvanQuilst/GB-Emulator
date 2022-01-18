@@ -4,8 +4,6 @@
  * handles the graphics processing
  */
 
-#include <SDL2/SDL.h>
-
 #include "gpu.h"
 #include "memory.h"
 
@@ -20,7 +18,6 @@
 SDL_Window *window;
 SDL_Renderer *renderer;
 SDL_Texture *texture;
-SDL_Event e;
 
 uint8_t pixels[HEIGHT*WIDTH*4];
 
@@ -95,5 +92,4 @@ void gpu_init(void)
 
   SDL_RenderCopy(renderer, texture, NULL, NULL);
   SDL_RenderPresent(renderer);
-
 }

@@ -15,6 +15,7 @@
 #include "cpu.h"
 #include "global.h"
 #include "gpu.h"
+#include "input.h"
 #include "registers.h"
 #include "rom.h"
 
@@ -54,7 +55,6 @@ void p_error(char *msg)
 int main(int argc, char **argv)
 {
 	bool running = true;	  	// is emulator running?
-	bool nowin = false;				// toggle window
 	char *filename;						// filename provided from user
 	char ch;									// char for options
 	int argnum = 1;
@@ -71,9 +71,6 @@ int main(int argc, char **argv)
 		switch (ch) {
 			case 'd': /* debug */
 				debug = true;
-				break;
-			case 't':	/* term only */
-				nowin = true;
 				break;
 			case 'h': /* help */
 				usage(argv[0]);
@@ -115,28 +112,13 @@ int main(int argc, char **argv)
 // Program Loop
 //
 ///////////////////////////////////////////////////////////
-
 	while (running) {
-    if (!stopped)
+    if (!stopped) {
 		  cpu_step();
+      gpu_step();
+    }
 
-    while (!nowin && SDL_PollEvent(&e) > 0) {
-      switch(e.type) {
-        case SDL_QUIT:
-          running = false;
-          break;
-
-        case SDL_KEYDOWN:
-          uint8_t const *keys = SDL_GetKeyboardState(NULL);
-
-          if (keys[SDL_SCANCODE_ESCAPE] == 1) running = false;
-
-          if (keys[SDL_SCANCODE_RETURN] == 1) stopped = false;
-          break;
-      }
-	  }
-
-    SDL_RenderPresent(renderer);
+    process_inputs();
 	}
 
   SDL_DestroyWindow(window);

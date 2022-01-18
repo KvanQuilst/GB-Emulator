@@ -11,6 +11,6 @@
 #include <stdio.h>
 #include <stdint.h>
 
-extern bool stoped;
+extern bool stopped;
 
 uint8_t cpu_step(void);
