@@ -680,6 +680,7 @@ static void ld_e_h(void) { registers.e = registers.h; }
 static void ld_e_l(void) { registers.e = registers.l; }
 
 // 0x5E LD E,(HL)
+static void ld_e_hl(void) { registers.e = read_byte(registers.hl); }
 
 // 0x5F LD E,A
 static void ld_e_a(void) { registers.e = registers.a; }

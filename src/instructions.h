@@ -168,7 +168,7 @@ static void ld_e_c(void);
 static void ld_e_d(void);
 static void ld_e_h(void);
 static void ld_e_l(void);
-//static void ld_e_hla(void);
+static void ld_e_hl(void);
 static void ld_e_a(void);
 
 // DE
@@ -338,7 +338,7 @@ const struct instruction instr[256] =
     {"LD	E,E", 0, nop, 1},								// 0x5B
     {"LD	E,H", 0, ld_e_h, 1},						// 0x5C
     {"LD	E,L", 0, ld_e_l, 1},						// 0x5D
-    {"LD	E,(HL)", 0, undefined, 2},			// 0x5E
+    {"LD	E,(HL)", 0, ld_e_hl, 2},			  // 0x5E
     {"LD	E,A", 0, ld_e_a, 1},						// 0x5F
     {"LD	H,B", 0, ld_h_b, 1},						// 0x60
     {"LD	H,C", 0, ld_h_c, 1},						// 0x61
