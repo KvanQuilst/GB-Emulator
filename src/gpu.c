@@ -5,34 +5,12 @@
  */
 
 #include "gpu.h"
-#include "memory.h"
-#include "palettes.h"
-
-/*struct tile
-{
-  uint8_t tile[8][8];
-};*/
-
-////
-//	Globals
-////
-SDL_Window *window;
-SDL_Renderer *renderer;
-SDL_Texture *texture;
-
-uint8_t pixels[HEIGHT*WIDTH*4];
 
 // print error message and exit with code 1
 static void g_error(const char *msg)
 {
 	fprintf(stderr, "gpu error: %s\n", msg);
 	exit(1);
-}
-
-// process any frame rendering
-void gpu_step(void)
-{
-  g_error("no");
 }
 
 // initialize gpu data
@@ -94,3 +72,36 @@ void gpu_init(void)
   SDL_RenderCopy(renderer, texture, NULL, NULL);
   SDL_RenderPresent(renderer);
 }
+
+static void update_tiles(void)
+{
+  uint8_t line1, line2;  
+  uint16_t addr = 0x8000 + 0x08000 * (LCDC & 0x10);
+  int i, j;
+
+  for (i = 0; i < TILE_NUM; i++) {
+    for (j = 0; j < 8; j++) {
+      line1 = read_byte(addr+j*16);
+      line2 = read_byte(addr+j*16+8);
+
+      tiles[i*32+j*8] = ;
+      tiles[i*32+j*8+1] = ;
+      tiles[i*32+j*8+2] = ;
+      tiles[i*32+j*8+3] = ;
+      tiles[i*32+j*8+4] = ;
+      tiles[i*32+j*8+5] = ;
+      tiles[i*32+j*8+6] = ;
+      tiles[i*32+j*8+7] = ;
+      tiles[i*32+j*8+8] = ;
+    }
+  }
+
+
+}
+
+// process any frame rendering
+void gpu_step(void)
+{
+  g_error("no");
+}
+

@@ -5,16 +5,10 @@
  * handles screen initialization and option processing
  */
 
-#include <SDL2/SDL.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
 #include "cpu.h"
 #include "global.h"
 #include "gpu.h"
+#include "include.h"
 #include "input.h"
 #include "registers.h"
 #include "rom.h"
