@@ -1,9 +1,9 @@
 /*
  * palettes.h
  */
+#pragma once
 
 struct palette {
-  int bg, light, med, dark;
+  int colors[4];
 };
 
-struct palette grey = {0xFFFFFF, 0xa8a8a8, 0x606060, 0x000000};
