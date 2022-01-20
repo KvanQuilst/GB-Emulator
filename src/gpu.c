@@ -49,7 +49,7 @@ void gpu_init(void)
   texture = SDL_CreateTexture(renderer,
                               SDL_PIXELFORMAT_ARGB8888,
                               SDL_TEXTUREACCESS_STREAMING,
-                              WIDTH, HEIGHT);
+                              HEIGHT, WIDTH);
   if (!texture) {
     SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
@@ -65,7 +65,7 @@ void gpu_init(void)
   SDL_UpdateTexture(texture,
                     NULL,
                     tiles,
-                    8*4);
+                    16*4);
 
   SDL_RenderCopy(renderer, texture, NULL, NULL);
   SDL_RenderPresent(renderer);
@@ -87,6 +87,8 @@ static void update_tiles(void)
     for (j = 0; j < 8; j++) {
       line1 = read_byte(addr+i*16+j*2);
       line2 = read_byte(addr+i*16+j*2+1);
+      if (i == 1)
+        //printf("%u %u\n", line1, line2);
       for (k = 0; k < 8; k++) {
         color = (((0x80 >> k) & line1) >> (k-7)) | (((0x80 >> k) & line2) >> (k-6));
         offset = i*256 + j*8 + k*4;

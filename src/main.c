@@ -111,6 +111,10 @@ int main(int argc, char **argv)
       
     }
 
+    if ((read_byte(STAT) & 0x03) < 2) {
+      //gpu_step();
+    }
+
     process_inputs();
 	}
 

@@ -24,6 +24,7 @@
 
 // Notable "Registers"
 #define LCDC 0xFF40
+#define STAT 0xFF41
 
 extern uint8_t mem[0xFFFF];
 
