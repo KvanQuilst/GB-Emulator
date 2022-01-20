@@ -21,7 +21,7 @@
 
 bool debug = false;	// debug flag
 
-bool running;
+bool running = true;
 
 ///////////////
 //
@@ -48,7 +48,6 @@ void p_error(char *msg)
 
 int main(int argc, char **argv)
 {
-	bool running = true;	  	// is emulator running?
 	char *filename;						// filename provided from user
 	char ch;									// char for options
 	int argnum = 1;
@@ -109,7 +108,7 @@ int main(int argc, char **argv)
 	while (running) {
     if (!stopped) {
 		  cpu_step();
-      gpu_step();
+      
     }
 
     process_inputs();
