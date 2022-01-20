@@ -46,14 +46,14 @@ const char *rom_string[256] =
 	[HuC3_RB]	= "Hudson HuC3+RAM+BATT"
 };
 
-uint8_t loadROM(char* filename)
+int loadROM(char* filename)
 {
 	char header[ROM_START]; // header of the rom
 	char title[TITLE_SIZE];	// title of rom
 	enum rom_t rom_type;	// type of ram
 	int rom_size;			// size of the rom
 	int ram_size;			// size of the save ram
-	size_t length;			// size of file
+	long length;			// size of file
 
 	FILE *rom;
 
@@ -117,7 +117,7 @@ uint8_t loadROM(char* filename)
 	rewind(rom);		
 
 		// read into cart
-	size_t tmp = 0;
+	long tmp = 0;
 	while (tmp < length) {
 		errno = 0;
 		tmp += fread(&mem[CART], 1, length-tmp, rom);

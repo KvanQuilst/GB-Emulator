@@ -59,4 +59,4 @@ enum rom_t {
 // prints header info and loads rom content into cart
 // requires: filename of GB rom
 // returns: 0 on success, -1 on fail
-uint8_t loadROM(char *filename);
+int loadROM(char *filename);

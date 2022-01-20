@@ -109,7 +109,7 @@ int main(int argc, char **argv)
 	while (running) {
     if (!stopped) {
 		  cpu_step();
-      //gpu_step();
+      gpu_step();
     }
 
     process_inputs();

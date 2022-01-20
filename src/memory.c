@@ -46,10 +46,10 @@ void init_mem(void)
 
 uint8_t read_byte(uint16_t address)
 {
-	if (address > 0xFFFF) {
+	/*if (address > 0xFFFF) {
 		fprintf(stderr, "read_byte: invalid address\n");
 		exit(1);
-	}
+	}*/
 	return mem[address];
 }
 
@@ -74,10 +74,10 @@ void write_byte(uint16_t address, uint8_t byte)
 {
 	//TODO CATCH ERROR IF invalid address to write
 
-	if (address > 0xFFFF) {
+	/*if (address > 0xFFFF) {
 		fprintf(stderr, "write_byte: invalid address\n");
 		exit(1);
-	}
+	}*/
 	mem[address] = byte;
 }
 

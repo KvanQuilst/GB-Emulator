@@ -1,7 +1,5 @@
 /*
- * gpu.c
- *
- * handles the graphics processing
+ * gpu.c * * handles the graphics processing
  */
 
 #include "gpu.h"
@@ -67,14 +65,6 @@ void gpu_init(void)
 
   update_tiles();
 
-  /*for (i = 0; i < 255; i++) {
-    offset = (WIDTH * 4 * i) + i * 4;        
-    pixels[offset + 0] = (uint8_t) (0xFF0000 & p.colors[2]) >> 4;
-    pixels[offset + 1] = (uint8_t) (0x00FF00 & p.colors[2]) >> 2;
-    pixels[offset + 2] = (uint8_t) (0x0000FF & p.colors[2]);
-    pixels[offset + 3] = SDL_ALPHA_OPAQUE;
-  }*/
-
   SDL_UpdateTexture(texture,
                     NULL,
                     tiles,
@@ -93,14 +83,14 @@ void gpu_step(void)
 static void update_tiles(void)
 {
   uint8_t line1, line2, color;  
-  uint16_t addr = 0x8000 + 0x08000 * (LCDC & 0x10);
+  uint16_t addr = 0x8000 + 0x0800 * (LCDC & 0x10);
   int i, j, k, offset;
 
   for (i = 0; i < TILE_NUM; i++) {
     for (j = 0; j < 8; j++) {
       line1 = read_byte(addr+j*16);
       line2 = read_byte(addr+j*16+8);
-      offset = i*32 + j*8;
+      offset = i*16 + j*2;
       for (k = 0; k < 8; k++) {
         color = (((0x80 >> k) & line1) >> (k-7)) | (((0x80 >> k) & line2) >> (k-6));
         tiles[offset] = (uint8_t) (0xFF0000 & p.colors[color]) >> 4;        

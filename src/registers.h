@@ -35,7 +35,7 @@
 #define CARRY_FLAG  0x10
 #define ALL_FLAGS	0xF0
 
-struct registers {
+extern struct registers {
     struct {
         union {
             struct {
@@ -74,7 +74,7 @@ struct registers {
     };
     uint16_t sp;
     uint16_t pc;
-} extern registers;
+} registers;
 
 // initialize the registers to their respective values
 void initRegs(void);
